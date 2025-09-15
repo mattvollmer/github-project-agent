@@ -23,6 +23,9 @@ const app = new App({
 const REACTION = "face_with_monocle"; // 🧐
 
 async function runAgentOnce(userText: string): Promise<string> {
+  if (!userText || userText.trim().length === 0) {
+    return "🧐 Ask me about your GitHub Projects. Examples:\n- what's new in the last 7 days for Project X?\n- list items in Project X with Status = In Progress\n- show all changes for repo owner/repo in Project X";
+  }
   const res = await generateText({
     model: "anthropic/claude-sonnet-4",
     system: buildSystemPrompt(),
