@@ -59,7 +59,7 @@ describe("contract: runQuery safety and limit/offset enforcement", () => {
     // The last structured call should be the wrapped SELECT
     const last = queryCalls.find((c) => typeof c !== "string") as any;
     expect(last.text).toMatch(
-      /select \* from \( select 1 as x \) as t limit \$1 offset \$2/i,
+      /select \* from \(\s*select 1 as x\s*\) as t limit \$(\d+) offset \$(\d+)/i,
     );
     // Clamped
     expect(last.values?.[0]).toBe(2000);

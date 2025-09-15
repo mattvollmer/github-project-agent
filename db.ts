@@ -173,8 +173,17 @@ export async function runQuery({
       `SET LOCAL statement_timeout TO '${Math.max(1000, Math.min(timeoutMs, 60000))}ms'`,
     );
 
+    // Determine the highest positional parameter index used in the input SQL (e.g., $1, $2, ...)
+    const matches = [...safeSql.matchAll(/\$(\d+)/g)];
+    const maxInSql = matches.length
+      ? Math.max(...matches.map((m) => Number(m[1]) || 0))
+      : 0;
+    const base = Math.max(maxInSql, Array.isArray(params) ? params.length : 0);
+    const limitIdx = base + 1;
+    const offsetIdx = base + 2;
+
     // Wrap the query to enforce limit/offset without trying to parse the SQL
-    const wrapped = `select * from ( ${safeSql} ) as t limit $${params.length + 1} offset $${params.length + 2}`;
+    const wrapped = `select * from ( ${safeSql} ) as t limit $${limitIdx} offset $${offsetIdx}`;
     const res = await client.query({
       text: wrapped,
       values: [...params, clampedLimit, clampedOffset],
