@@ -2,12 +2,15 @@ import { it, expect } from "vitest";
 import { runQuery } from "../db.ts";
 import { buildSystemPrompt } from "../prompt.ts";
 
-const GATEWAY_KEY = process.env.AI_GATEWAY_API_KEY || "";
-const GATEWAY_BASE =
-  process.env.AI_GATEWAY_BASE_URL || "https://api.openai.com/v1";
-const GATEWAY_MODEL = process.env.AI_GATEWAY_MODEL || "gpt-4o-mini";
+const GATEWAY_KEY = process.env.AI_GATEWAY_API_KEY;
+const GATEWAY_BASE = process.env.AI_GATEWAY_BASE_URL;
+const GATEWAY_MODEL = process.env.AI_GATEWAY_MODEL;
 
-const HAS_E2E = !!process.env.DATABASE_URL && !!GATEWAY_KEY;
+const HAS_E2E =
+  !!process.env.DATABASE_URL &&
+  !!GATEWAY_KEY &&
+  !!GATEWAY_BASE &&
+  !!GATEWAY_MODEL;
 const itE2E = HAS_E2E ? it : it.skip;
 
 async function nlToSql(prompt: string): Promise<string> {

@@ -18,7 +18,7 @@ jobs:
       NEON_ROLE: ${{ vars.NEON_ROLE || 'neondb_owner' }}
       AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY || vars.AI_GATEWAY_API_KEY }}
       AI_GATEWAY_MODEL: ${{ vars.AI_GATEWAY_MODEL }}
-      AI_GATEWAY_BASE_URL: ${{ vars.AI_GATEWAY_BASE_URL || 'https://api.openai.com/v1' }}
+      AI_GATEWAY_BASE_URL: ${{ vars.AI_GATEWAY_BASE_URL }}
 
     steps:
       - uses: actions/checkout@v4
