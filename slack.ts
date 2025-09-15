@@ -1,6 +1,6 @@
 import { App, LogLevel } from "@slack/bolt";
 import { z } from "zod";
-import { generateText, tool } from "ai";
+import { streamText, tool } from "ai";
 import { buildSystemPrompt } from "./prompt.js";
 import { getSchema, runQuery } from "./db.js";
 
@@ -36,13 +36,13 @@ async function runAgentOnce(userText: string): Promise<string> {
   }
   const system =
     buildSystemPrompt() +
-    "\n\nSlack behavior:\n- Return a single final message with results.\n- Do not write preambles like 'I'll help you' or 'let me check'.\n- If tools are needed, call them and include the results in this one message.\n- Keep answers concise and formatted for Slack mrkdwn.\n";
-  const res = await generateText({
+    "\n\nSlack behavior:\n- You MUST send exactly one final message using the slack_send tool.\n- Do not write preambles like 'I'll help you' or 'let me check'.\n- If database results are needed, call db_schema/db_query first, then slack_send with the answer.\n- Format for Slack mrkdwn.\n- Do not include monocle emoji in the message text.\n";
+  const res = await streamText({
     model: "anthropic/claude-sonnet-4",
     system,
     temperature: 0,
     toolChoice: "auto" as const,
-    maxToolRoundtrips: 5 as const,
+    maxToolRoundtrips: 8 as const,
     messages: [{ role: "user", content: userText }],
     tools: {
       db_schema: tool({
@@ -81,6 +81,24 @@ async function runAgentOnce(userText: string): Promise<string> {
             timeoutMs,
           });
           return result;
+        },
+      }),
+      slack_send: tool({
+        description:
+          "Send exactly one Slack message in the current thread. Use mrkdwn formatting.",
+        inputSchema: z.object({
+          text: z.string().min(1),
+        }),
+        execute: async ({ text }) => {
+          const clean = stripMonocle(text);
+          await client.chat.postMessage({
+            channel,
+            thread_ts,
+            mrkdwn: true,
+            text: clean,
+          });
+          postedByTool = true;
+          return { ok: true };
         },
       }),
     },
