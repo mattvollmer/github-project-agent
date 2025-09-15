@@ -47,25 +47,24 @@ jobs:
         id: cs
         if: ${{ env.NEON_API_KEY != '' && env.NEON_PROJECT_ID != '' && steps.create-branch.outcome == 'success' }}
         run: |
-          RAW=$(neonctl connection-string \"$BRANCH_NAME\" \
-            --project-id \"$NEON_PROJECT_ID\" \
-            --database-name \"$NEON_DATABASE\" \
-            --role-name \"$NEON_ROLE\" \
-            --api-key \"$NEON_API_KEY\" \
-            -o json 2>/dev/null || neonctl connection-string \"$BRANCH_NAME\" \
-            --project-id \"$NEON_PROJECT_ID\" \
-            --database-name \"$NEON_DATABASE\" \
-            --role-name \"$NEON_ROLE\" \
-            --api-key \"$NEON_API_KEY\") \
-          if echo \"$RAW\" | jq -e . >/dev/null 2>&1; then \
-            CONN=$(echo \"$RAW\" | jq -r '.connection_string // .connectionString // empty') \
-            if [ -z \"$CONN\" ]; then \
-              CONN=\"$RAW\" \
-            fi \
-          else \
-            CONN=\"$RAW\" \
-          fi \
-          echo \"DATABASE_URL=$CONN\" >> \"$GITHUB_OUTPUT\""
+          RAW=$(neonctl connection-string "$BRANCH_NAME" \
+            --project-id "$NEON_PROJECT_ID" \
+            --database-name "$NEON_DATABASE" \
+            --role-name "$NEON_ROLE" \
+            --api-key "$NEON_API_KEY" -o json 2>/dev/null || neonctl connection-string "$BRANCH_NAME" \
+            --project-id "$NEON_PROJECT_ID" \
+            --database-name "$NEON_DATABASE" \
+            --role-name "$NEON_ROLE" \
+            --api-key "$NEON_API_KEY")
+          if echo "$RAW" | jq -e . >/dev/null 2>&1; then
+            CONN=$(echo "$RAW" | jq -r '.connection_string // .connectionString // empty')
+            if [ -z "$CONN" ]; then
+              CONN="$RAW"
+            fi
+          else
+            CONN="$RAW"
+          fi
+          echo "DATABASE_URL=$CONN" >> "$GITHUB_OUTPUT"
 
       - name: Assert DATABASE_URL is non-empty
         if: ${{ env.NEON_API_KEY != '' && env.NEON_PROJECT_ID != '' }}
