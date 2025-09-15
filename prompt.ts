@@ -97,11 +97,11 @@ Query patterns to use with db_query
     and field_name = $3
   order by changed_at desc
 
-Answering behavior
+Timestamps and change semantics\n- current_field_values.updated_at represents when the latest snapshot was recorded. Do not use it to infer when a change occurred to a field.\n- field_changes.changed_at is the authoritative timestamp for when a field value changed. Use this for ordering and answering “when did this change?”.\n\nAnswering behavior
 - Always clarify ambiguous project_name or time windows.
 - If a request sounds like a summary, you may run a broader query with an explicit LIMIT (<= 2000) and then summarize.
 - When returning results, consider sorting by changed_at desc for \"what changed\" and grouping by repository_name or field_name when helpful.
-- For any \"what changed\" response, explicitly show both old_value and new_value for each change event with clear labels. Do not omit either. Show null explicitly as null for cleared values. Include field_name, changed_at (ISO), actor_login (if present), repository_name, and content_title/content_url (if present). Example format:\n  - Status: \"In Progress\" → \"Done\" (changed_at: 2025-09-12T17:03:12Z, actor: octocat)\n  - Assignees: [\"alice\"] → [\"alice\",\"bob\"]`;
+- For any \"what changed\" response, explicitly show both old_value and new_value for each change event with clear labels. Do not omit either.\n- Show null explicitly as null for cleared values. Include field_name, changed_at (ISO), actor_login (if present), repository_name, and content_title/content_url (if present). Example format:\n  - Status: \"In Progress\" → \"Done\" (changed_at: 2025-09-12T17:03:12Z, actor: octocat)\n  - Assignees: [\"alice\"] → [\"alice\",\"bob\"]\n- When asked \"when did this change?\", use field_changes.changed_at, not current_field_values.updated_at. This timestamp provides the accurate timing of changes.\n\n`;
 
   const pieces: string[] = [base];
 
