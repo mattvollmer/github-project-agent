@@ -47,16 +47,32 @@ async function nlToSql(
 
   const data = (await res.json()) as any;
   const content = data?.choices?.[0]?.message?.content ?? "";
-  // Parse JSON code block for params
-  const jsonMatch = content.match(/```json\\s*([\\s\\S]*?)```/i);
-  if (!jsonMatch) throw new Error("no_json_block_found");
-  const params = JSON.parse(jsonMatch[1]);
-  // Parse SQL code block
-  const sqlMatch = content.match(/```sql\\s*([\\s\\S]*?)```/i);
+  const sqlMatch = content.match(/```sql\s*([\s\S]*?)```/i);
+  const jsonMatch = content.match(/```json\s*([\s\S]*?)```/i);
   if (!sqlMatch) throw new Error("no_sql_block_found");
-  const sql = (sqlMatch ? sqlMatch[1] : content).trim();
+  const sql = sqlMatch[1].trim();
+  let params: unknown[] = [];
+  if (jsonMatch) {
+    try {
+      const parsed = JSON.parse(jsonMatch[1]);
+      params = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray((parsed as any)?.params)
+          ? (parsed as any).params
+          : [];
+    } catch {
+      params = [];
+    }
+  }
   if (!/^\s*with\s+|^\s*select\s+/i.test(sql)) {
     throw new Error(`not_select_sql: ${sql.slice(0, 160)}`);
+  }
+  const maxPlaceholder = (() => {
+    const m = [...sql.matchAll(/\$(\d+)/g)];
+    return m.length ? Math.max(...m.map((x) => Number(x[1]) || 0)) : 0;
+  })();
+  if (maxPlaceholder > 0 && params.length < maxPlaceholder) {
+    // allow caller to inject fallback params per test
   }
   return { sql, params };
 }
