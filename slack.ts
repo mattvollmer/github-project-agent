@@ -34,9 +34,12 @@ async function runAgentOnce(userText: string): Promise<string> {
   if (!userText || userText.trim().length === 0) {
     return "Ask me about your GitHub Projects. Examples:\n- what's new in the last 7 days for Project X?\n- list items in Project X with Status = In Progress\n- show all changes for repo owner/repo in Project X";
   }
+  const system =
+    buildSystemPrompt() +
+    "\n\nSlack behavior:\n- Return a single final message with results.\n- Do not write preambles like 'I'll help you' or 'let me check'.\n- If tools are needed, call them and include the results in this one message.\n- Keep answers concise and formatted for Slack mrkdwn.\n";
   const res = await generateText({
     model: "anthropic/claude-sonnet-4",
-    system: buildSystemPrompt(),
+    system,
     messages: [{ role: "user", content: userText }],
     tools: {
       db_schema: tool({
