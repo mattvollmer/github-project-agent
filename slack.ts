@@ -46,13 +46,14 @@ async function runAgentSession(args: {
     return;
   }
   let postedByTool = false;
+
   const result = await streamText({
     model: "anthropic/claude-sonnet-4",
     system:
       buildSystemPrompt() +
-      "\n\nSlack behavior:\n- You MUST send exactly one final message using the slack_send tool.\n- Do not write preambles like 'I'll help you' or 'let me check'.\n- If database results are needed, call db_schema/db_query first, then slack_send with the answer.\n- Format for Slack mrkdwn.\n- Do not include monocle emoji in the message text.",
+      "\n\nSlack behavior:\n- You MUST send exactly one final message using the slack_send tool.\n- Do not write preambles like \"I'll help you\" or \"let me check\".\n- If database results are needed, call db_schema/db_query first, then slack_send with the answer.\n- Format for Slack mrkdwn.\n- Do not include monocle emoji in the message text.\n",
     temperature: 0,
-    toolChoice: "auto" as const,
+    toolChoice: { type: "tool", toolName: "slack_send" } as any,
     messages: [{ role: "user", content: userText }],
     tools: {
       db_schema: tool({
@@ -104,7 +105,6 @@ async function runAgentSession(args: {
           await client.chat.postMessage({
             channel,
             thread_ts,
-            mrkdwn: true,
             text: clean,
           });
           postedByTool = true;
@@ -113,12 +113,42 @@ async function runAgentSession(args: {
       }),
     },
   });
+
   if (!postedByTool) {
-    const finalText = await result.text; // Changed from result.toText() to result.text
-    const clean = stripMonocle(finalText || "_No response._");
-    if (clean.trim().length > 0) {
-      await client.chat.postMessage({ channel, thread_ts, text: clean });
-    }
+    // Second strict pass requiring slack_send with no preambles.
+    const strict = await streamText({
+      model: "anthropic/claude-sonnet-4",
+      system:
+        buildSystemPrompt() +
+        "\n\nSlack behavior (strict):\n- You MUST post the answer using slack_send.\n- First call db_schema/db_query as needed.\n- Do NOT output any text except via slack_send.\n- No preambles.\n",
+      temperature: 0,
+      toolChoice: { type: "tool", toolName: "slack_send" } as any,
+      messages: [{ role: "user", content: userText }],
+      tools: {
+        db_schema: tool({ inputSchema: z.object({}), execute: async () => getSchema() }),
+        db_query: tool({
+          inputSchema: z.object({
+            sql: z.string(),
+            params: z.array(z.any()).optional().default([]),
+            limit: z.number().int().min(1).max(2000).optional().default(200),
+            offset: z.number().int().min(0).optional().default(0),
+            timeoutMs: z.number().int().min(1000).max(60000).optional().default(15000),
+          }),
+          execute: async ({ sql, params, limit, offset, timeoutMs }) =>
+            runQuery({ sql, params, limit, offset, timeoutMs }),
+        }),
+        slack_send: tool({
+          inputSchema: z.object({ text: z.string().min(1) }),
+          execute: async ({ text }) => {
+            const clean = stripMonocle(text);
+            await client.chat.postMessage({ channel, thread_ts, text: clean });
+            postedByTool = true;
+            return { ok: true };
+          },
+        }),
+      },
+    });
+    await strict.text; // ensure completion
   }
 }
 
