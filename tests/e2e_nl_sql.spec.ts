@@ -13,7 +13,9 @@ const HAS_E2E =
   !!GATEWAY_MODEL;
 const itE2E = HAS_E2E ? it : it.skip;
 
-async function nlToSql(prompt: string): Promise<string> {
+async function nlToSql(
+  prompt: string,
+): Promise<{ sql: string; params: unknown[] }> {
   const system =
     buildSystemPrompt() +
     "\n\nAdditional instructions:" +
@@ -45,14 +47,18 @@ async function nlToSql(prompt: string): Promise<string> {
 
   const data = (await res.json()) as any;
   const content = data?.choices?.[0]?.message?.content ?? "";
-  const match =
-    content.match(/```sql\s*([\s\S]*?)```/i) ||
-    content.match(/```\s*([\s\S]*?)```/i);
-  const sql = (match ? match[1] : content).trim();
+  // Parse JSON code block for params
+  const jsonMatch = content.match(/```json\\s*([\\s\\S]*?)```/i);
+  if (!jsonMatch) throw new Error("no_json_block_found");
+  const params = JSON.parse(jsonMatch[1]);
+  // Parse SQL code block
+  const sqlMatch = content.match(/```sql\\s*([\\s\\S]*?)```/i);
+  if (!sqlMatch) throw new Error("no_sql_block_found");
+  const sql = (sqlMatch ? sqlMatch[1] : content).trim();
   if (!/^\s*with\s+|^\s*select\s+/i.test(sql)) {
     throw new Error(`not_select_sql: ${sql.slice(0, 160)}`);
   }
-  return sql;
+  return { sql, params };
 }
 
 // Increase per-test timeout for E2E calls
@@ -65,11 +71,10 @@ const A_END = "2025-01-12T23:59:59Z";
 itE2E(
   "e2e: Proj A field_changes in fixed window = 4",
   async () => {
-    const sql = await nlToSql(
-      `For project "Proj A", how many field changes occurred between ${A_START} and ${A_END}? Return a single row with a numeric count.`,
+    const { sql, params } = await nlToSql(
+      `For project \"Proj A\", how many field changes occurred between ${A_START} and ${A_END}? Return a single row with a numeric count.`,
     );
-    const res = await runQuery({ sql, limit: 2000 });
-    // Accept either a count(*) row or selecting rows and we count here
+    const res = await runQuery({ sql, params, limit: 2000 });
     const count = (() => {
       const row = res.rows?.[0] ?? {};
       const byKey = Object.values(row).find((v) => typeof v === "number");
@@ -84,10 +89,10 @@ itE2E(
 itE2E(
   "e2e: Proj A ITEM_A_1 Status is Done",
   async () => {
-    const sql = await nlToSql(
-      `In project "Proj A", what is the current Status of item with node id ITEM_A_1? Return a single row with the status value.`,
+    const { sql, params } = await nlToSql(
+      `In project \"Proj A\", what is the current Status of item with node id ITEM_A_1? Return a single row with the status value.`,
     );
-    const res = await runQuery({ sql, limit: 50 });
+    const res = await runQuery({ sql, params, limit: 50 });
     const textVal = (() => {
       const row = res.rows?.[0] ?? {};
       const str = Object.values(row).find((v) => typeof v === "string") as
@@ -104,12 +109,11 @@ itE2E(
 itE2E(
   "e2e: Proj A has one deletion event",
   async () => {
-    const sql = await nlToSql(
-      `List deletion events for project "Proj A" using the field_changes table. Return the old and new values.`,
+    const { sql, params } = await nlToSql(
+      `List deletion events for project \"Proj A\" using the field_changes table. Return the old and new values.`,
     );
-    const res = await runQuery({ sql, limit: 50 });
+    const res = await runQuery({ sql, params, limit: 50 });
     expect(res.rowCount).toBeGreaterThanOrEqual(1);
-    // Must contain a row where old_value=true and new_value is null
     const ok = res.rows.some(
       (r) =>
         r?.old_value === true &&
