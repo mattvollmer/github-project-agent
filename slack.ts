@@ -46,6 +46,7 @@ async function runAgentSession(args: {
     return;
   }
   let postedByTool = false;
+  let invokedDbQuery = false;
 
   const result = await streamText({
     model: "anthropic/claude-sonnet-4",
@@ -53,7 +54,7 @@ async function runAgentSession(args: {
       buildSystemPrompt() +
       "\n\nSlack behavior:\n- You MUST send exactly one final message using the slack_send tool.\n- Do not write preambles like \"I'll help you\" or \"let me check\".\n- If database results are needed, call db_schema/db_query first, then slack_send with the answer.\n- Format for Slack mrkdwn.\n- Do not include monocle emoji in the message text.\n",
     temperature: 0,
-    toolChoice: { type: "tool", toolName: "slack_send" } as any,
+    toolChoice: "auto" as const,
     messages: [{ role: "user", content: userText }],
     tools: {
       db_schema: tool({
@@ -84,6 +85,7 @@ async function runAgentSession(args: {
             .default(15000),
         }),
         execute: async ({ sql, params, limit, offset, timeoutMs }) => {
+          invokedDbQuery = true;
           const result = await runQuery({
             sql,
             params,
@@ -101,6 +103,11 @@ async function runAgentSession(args: {
           text: z.string().min(1),
         }),
         execute: async ({ text }) => {
+          if (!invokedDbQuery) {
+            throw new Error(
+              "Before calling slack_send, you MUST run db_query to fetch data (e.g., for 'what changed today', use changed_at >= date_trunc('day', now()) and filter by project_name). Then call slack_send once with the summarized results."
+            );
+          }
           const clean = stripMonocle(text);
           await client.chat.postMessage({
             channel,
@@ -122,7 +129,7 @@ async function runAgentSession(args: {
         buildSystemPrompt() +
         "\n\nSlack behavior (strict):\n- You MUST post the answer using slack_send.\n- First call db_schema/db_query as needed.\n- Do NOT output any text except via slack_send.\n- No preambles.\n",
       temperature: 0,
-      toolChoice: { type: "tool", toolName: "slack_send" } as any,
+      toolChoice: "auto" as const,
       messages: [{ role: "user", content: userText }],
       tools: {
         db_schema: tool({ inputSchema: z.object({}), execute: async () => getSchema() }),
@@ -134,12 +141,19 @@ async function runAgentSession(args: {
             offset: z.number().int().min(0).optional().default(0),
             timeoutMs: z.number().int().min(1000).max(60000).optional().default(15000),
           }),
-          execute: async ({ sql, params, limit, offset, timeoutMs }) =>
-            runQuery({ sql, params, limit, offset, timeoutMs }),
+          execute: async ({ sql, params, limit, offset, timeoutMs }) => {
+            invokedDbQuery = true;
+            return runQuery({ sql, params, limit, offset, timeoutMs });
+          },
         }),
         slack_send: tool({
           inputSchema: z.object({ text: z.string().min(1) }),
           execute: async ({ text }) => {
+            if (!invokedDbQuery) {
+              throw new Error(
+                "Before calling slack_send, you MUST run db_query to fetch data (e.g., for 'what changed today', use changed_at >= date_trunc('day', now()) and filter by project_name). Then call slack_send once with the summarized results."
+              );
+            }
             const clean = stripMonocle(text);
             await client.chat.postMessage({ channel, thread_ts, text: clean });
             postedByTool = true;
