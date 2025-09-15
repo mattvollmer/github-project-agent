@@ -30,19 +30,29 @@ function stripMonocle(input: string): string {
     .trim();
 }
 
-async function runAgentOnce(userText: string): Promise<string> {
+async function runAgentSession(args: {
+  userText: string;
+  channel: string;
+  thread_ts: string;
+  client: any;
+}) {
+  const { userText, channel, thread_ts, client } = args;
   if (!userText || userText.trim().length === 0) {
-    return "Ask me about your GitHub Projects. Examples:\n- what's new in the last 7 days for Project X?\n- list items in Project X with Status = In Progress\n- show all changes for repo owner/repo in Project X";
+    await client.chat.postMessage({
+      channel,
+      thread_ts,
+      text: "Ask me about your GitHub Projects. For example:\n- what's new in the last 7 days for Project X?\n- list items in Project X with Status = In Progress\n- show all changes for repo owner/repo in Project X",
+    });
+    return;
   }
-  const system =
-    buildSystemPrompt() +
-    "\n\nSlack behavior:\n- You MUST send exactly one final message using the slack_send tool.\n- Do not write preambles like 'I'll help you' or 'let me check'.\n- If database results are needed, call db_schema/db_query first, then slack_send with the answer.\n- Format for Slack mrkdwn.\n- Do not include monocle emoji in the message text.\n";
-  const res = await streamText({
+  let postedByTool = false;
+  const result = await streamText({
     model: "anthropic/claude-sonnet-4",
-    system,
+    system:
+      buildSystemPrompt() +
+      "\n\nSlack behavior:\n- You MUST send exactly one final message using the slack_send tool.\n- Do not write preambles like 'I'll help you' or 'let me check'.\n- If database results are needed, call db_schema/db_query first, then slack_send with the answer.\n- Format for Slack mrkdwn.\n- Do not include monocle emoji in the message text.",
     temperature: 0,
     toolChoice: "auto" as const,
-    maxToolRoundtrips: 8 as const,
     messages: [{ role: "user", content: userText }],
     tools: {
       db_schema: tool({
@@ -103,8 +113,13 @@ async function runAgentOnce(userText: string): Promise<string> {
       }),
     },
   });
-  const text = res.text || "_No response._";
-  return stripMonocle(text);
+  if (!postedByTool) {
+    const finalText = await result.text; // Changed from result.toText() to result.text
+    const clean = stripMonocle(finalText || "_No response._");
+    if (clean.trim().length > 0) {
+      await client.chat.postMessage({ channel, thread_ts, text: clean });
+    }
+  }
 }
 
 function cleanMention(text: string, botUserId?: string): string {
@@ -121,28 +136,19 @@ app.event("app_mention", async ({ event, client, logger, context }) => {
   const userText = cleanMention((event as any).text || "", botUserId);
   const channel = event.channel as string;
   const ts = (event as any).ts as string;
+  const thread_ts = ((event as any).thread_ts as string) || ts;
 
   try {
-    // Add thinking face reaction
     try {
       await client.reactions.add({ channel, name: REACTION, timestamp: ts });
     } catch (err) {
       logger.warn({ err }, "failed_to_add_reaction");
     }
 
-    const answer = stripMonocle(await runAgentOnce(userText));
-
-    // Post a message as a reply
-    await client.chat.postMessage({
-      channel,
-      text: stripMonocle(answer),
-      mrkdwn: true as any,
-      thread_ts: (event as any).thread_ts || (event as any).ts,
-    });
+    await runAgentSession({ userText, channel, thread_ts, client });
   } catch (err) {
     logger.error(err);
   } finally {
-    // Ensure the reaction is removed
     try {
       await client.reactions.remove({ channel, name: REACTION, timestamp: ts });
     } catch (err) {
@@ -156,6 +162,7 @@ app.event("message", async ({ event, client, logger }) => {
   if (e.channel_type !== "im" || e.subtype) return;
   const channel = e.channel as string;
   const ts = e.ts as string;
+  const thread_ts = (e.thread_ts as string) || ts;
 
   try {
     try {
@@ -164,13 +171,7 @@ app.event("message", async ({ event, client, logger }) => {
       logger.warn({ err }, "failed_to_add_reaction");
     }
 
-    const answer = stripMonocle(await runAgentOnce(e.text || ""));
-    await client.chat.postMessage({
-      channel,
-      text: stripMonocle(answer),
-      mrkdwn: true as any,
-      thread_ts: e.thread_ts || e.ts,
-    });
+    await runAgentSession({ userText: e.text || "", channel, thread_ts, client });
   } catch (err) {
     logger.error(err);
   } finally {
