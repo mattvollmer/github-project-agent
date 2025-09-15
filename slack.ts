@@ -40,6 +40,9 @@ async function runAgentOnce(userText: string): Promise<string> {
   const res = await generateText({
     model: "anthropic/claude-sonnet-4",
     system,
+    temperature: 0,
+    toolChoice: "auto" as const,
+    maxToolRoundtrips: 5 as const,
     messages: [{ role: "user", content: userText }],
     tools: {
       db_schema: tool({
