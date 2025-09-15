@@ -47,6 +47,9 @@ async function runAgentSession(args: {
   }
   let postedByTool = false;
   let invokedDbQuery = false;
+  const lc = userText.toLowerCase();
+  const requireChanged = /what\\s+changed|changed\\s+(today|recent|this\\s+week|last\\s+\\d+\\s+days)/i.test(lc);
+  let changedQueryOk = false;
 
   const result = await streamText({
     model: "anthropic/claude-sonnet-4",
@@ -86,6 +89,12 @@ async function runAgentSession(args: {
         }),
         execute: async ({ sql, params, limit, offset, timeoutMs }) => {
           invokedDbQuery = true;
+          const s = (sql || "").toLowerCase();
+          if (requireChanged) {
+            if (s.includes("from field_changes") && s.includes("changed_at") && s.includes("project_name")) {
+              changedQueryOk = true;
+            }
+          }
           const result = await runQuery({
             sql,
             params,
