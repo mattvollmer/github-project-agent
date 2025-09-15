@@ -48,7 +48,7 @@ jobs:
             --database-name "$DB_NAME" \
             --role-name "$ROLE_NAME" \
             --api-key "$NEON_API_KEY" \
-            -o json | jq -r '.connection_string')
+            -o json | jq -r '.connection_string // .connectionString')
           echo "DATABASE_URL=$CONN" >> "$GITHUB_OUTPUT"
 
       - name: Seed schema and data
