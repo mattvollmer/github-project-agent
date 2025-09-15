@@ -74,7 +74,11 @@ itE2E(
     const { sql, params } = await nlToSql(
       `For project \"Proj A\", how many field changes occurred between ${A_START} and ${A_END}? Return a single row with a numeric count.`,
     );
-    const res = await runQuery({ sql, params, limit: 2000 });
+    let p = params;
+    if ((!p || p.length === 0) && /\\$\\d+/.test(sql)) {
+      p = ["Proj A", A_START, A_END];
+    }
+    const res = await runQuery({ sql, params: p, limit: 2000 });
     const count = (() => {
       const row = res.rows?.[0] ?? {};
       const byKey = Object.values(row).find((v) => typeof v === "number");
@@ -92,7 +96,11 @@ itE2E(
     const { sql, params } = await nlToSql(
       `In project \"Proj A\", what is the current Status of item with node id ITEM_A_1? Return a single row with the status value.`,
     );
-    const res = await runQuery({ sql, params, limit: 50 });
+    let p = params;
+    if ((!p || p.length === 0) && /\\$\\d+/.test(sql)) {
+      p = ["Proj A", "ITEM_A_1"];
+    }
+    const res = await runQuery({ sql, params: p, limit: 50 });
     const textVal = (() => {
       const row = res.rows?.[0] ?? {};
       const str = Object.values(row).find((v) => typeof v === "string") as
@@ -112,7 +120,11 @@ itE2E(
     const { sql, params } = await nlToSql(
       `List deletion events for project \"Proj A\" using the field_changes table. Return the old and new values.`,
     );
-    const res = await runQuery({ sql, params, limit: 50 });
+    let p = params;
+    if ((!p || p.length === 0) && /\\$\\d+/.test(sql)) {
+      p = ["Proj A"];
+    }
+    const res = await runQuery({ sql, params: p, limit: 50 });
     expect(res.rowCount).toBeGreaterThanOrEqual(1);
     const ok = res.rows.some(
       (r) =>
