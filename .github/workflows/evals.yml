@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      BRANCH_NAME: evals-${{ github.run_id }}-${{ github.sha }}
 
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +22,7 @@ jobs:
         uses: neondatabase/create-branch-action@v6
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
-          branch_name: evals-${{ github.run_id }}-${{ github.sha }}
+          branch_name: ${{ env.BRANCH_NAME }}
           role: ${{ vars.NEON_ROLE || 'neondb_owner' }}
           api_key: ${{ secrets.NEON_API_KEY }}
 
@@ -37,7 +39,7 @@ jobs:
         env:
           NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
           NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
-          BRANCH_NAME: ${{ steps.create-branch.outputs.branch_name }}
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
           DB_NAME: ${{ vars.NEON_DATABASE || 'neondb' }}
           ROLE_NAME: ${{ vars.NEON_ROLE || 'neondb_owner' }}
         run: |
@@ -73,9 +75,9 @@ jobs:
         run: npm test
 
       - name: Delete Neon branch
-        if: ${{ always() && secrets.NEON_API_KEY != '' && vars.NEON_PROJECT_ID != '' && steps.create-branch.outputs.branch_name != '' }}
+        if: ${{ always() && secrets.NEON_API_KEY != '' && vars.NEON_PROJECT_ID != '' }}
         uses: neondatabase/delete-branch-action@v3
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
-          branch: ${{ steps.create-branch.outputs.branch_name }}
+          branch: ${{ env.BRANCH_NAME }}
           api_key: ${{ secrets.NEON_API_KEY }}
