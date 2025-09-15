@@ -48,14 +48,15 @@ async function runAgentSession(args: {
   let postedByTool = false;
   let invokedDbQuery = false;
   const lc = userText.toLowerCase();
-  const requireChanged = /what\\s+changed|changed\\s+(today|recent|this\\s+week|last\\s+\\d+\\s+days)/i.test(lc);
+  const requireChanged = /what\s+changed|changed\s+(today|recent|this\s+week|last\s+\d+\s+days)/i.test(lc);
   let changedQueryOk = false;
+  let postedAfterQuery = false;
 
   const result = await streamText({
     model: "anthropic/claude-sonnet-4",
     system:
       buildSystemPrompt() +
-      "\n\nSlack behavior:\n- You MUST send exactly one final message using the slack_send tool.\n- Do not write preambles like \"I'll help you\" or \"let me check\".\n- If database results are needed, call db_schema/db_query first, then slack_send with the answer.\n- Format for Slack mrkdwn.\n- Do not include monocle emoji in the message text.\n",
+      "\n\nSlack behavior:\n- You MAY post brief clarifications or disambiguation via slack_send before any database calls.\n- Once you call db_query, you MUST produce exactly one final results message via slack_send in this run.\n- For results, do not write preambles like \"I'll help you\" — post the answer concisely.\n- If database results are needed, call db_schema/db_query first, then slack_send with the answer.\n- Format for Slack mrkdwn.\n- Do not include monocle emoji in the message text.",
     temperature: 0,
     toolChoice: "auto" as const,
     messages: [{ role: "user", content: userText }],
@@ -107,15 +108,22 @@ async function runAgentSession(args: {
       }),
       slack_send: tool({
         description:
-          "Send exactly one Slack message in the current thread. Use mrkdwn formatting.",
+          "Send a Slack message in the current thread. Use mrkdwn formatting.",
         inputSchema: z.object({
           text: z.string().min(1),
         }),
         execute: async ({ text }) => {
-          if (!invokedDbQuery) {
-            throw new Error(
-              "Before calling slack_send, you MUST run db_query to fetch data (e.g., for 'what changed today', use changed_at >= date_trunc('day', now()) and filter by project_name). Then call slack_send once with the summarized results."
-            );
+          // Before any DB calls, allow free clarifications.
+          if (invokedDbQuery) {
+            // After db_query, allow exactly one final message, and require correct query for 'what changed'.
+            if (postedAfterQuery) {
+              throw new Error("You have already posted the final message for this run.");
+            }
+            if (requireChanged && !changedQueryOk) {
+              throw new Error(
+                "For 'what changed', you MUST query field_changes with changed_at and project_name filters before the final message."
+              );
+            }
           }
           const clean = stripMonocle(text);
           await client.chat.postMessage({
@@ -124,6 +132,7 @@ async function runAgentSession(args: {
             text: clean,
           });
           postedByTool = true;
+          if (invokedDbQuery) postedAfterQuery = true;
           return { ok: true };
         },
       }),
@@ -131,12 +140,11 @@ async function runAgentSession(args: {
   });
 
   if (!postedByTool) {
-    // Second strict pass requiring slack_send with no preambles.
     const strict = await streamText({
       model: "anthropic/claude-sonnet-4",
       system:
         buildSystemPrompt() +
-        "\n\nSlack behavior (strict):\n- You MUST post the answer using slack_send.\n- First call db_schema/db_query as needed.\n- Do NOT output any text except via slack_send.\n- No preambles.\n",
+        "\n\nSlack behavior (strict):\n- You MAY post brief clarifications via slack_send before any DB call.\n- Once you call db_query, you MUST post exactly one final results message via slack_send and stop.\n- Do NOT output any text except via slack_send.",
       temperature: 0,
       toolChoice: "auto" as const,
       messages: [{ role: "user", content: userText }],
@@ -152,26 +160,38 @@ async function runAgentSession(args: {
           }),
           execute: async ({ sql, params, limit, offset, timeoutMs }) => {
             invokedDbQuery = true;
+            const s = (sql || "").toLowerCase();
+            if (requireChanged) {
+              if (s.includes("from field_changes") && s.includes("changed_at") && s.includes("project_name")) {
+                changedQueryOk = true;
+              }
+            }
             return runQuery({ sql, params, limit, offset, timeoutMs });
           },
         }),
         slack_send: tool({
           inputSchema: z.object({ text: z.string().min(1) }),
           execute: async ({ text }) => {
-            if (!invokedDbQuery) {
-              throw new Error(
-                "Before calling slack_send, you MUST run db_query to fetch data (e.g., for 'what changed today', use changed_at >= date_trunc('day', now()) and filter by project_name). Then call slack_send once with the summarized results."
-              );
+            if (invokedDbQuery) {
+              if (postedAfterQuery) {
+                throw new Error("You have already posted the final message for this run.");
+              }
+              if (requireChanged && !changedQueryOk) {
+                throw new Error(
+                  "For 'what changed', you MUST query field_changes with changed_at and project_name filters before the final message."
+                );
+              }
             }
             const clean = stripMonocle(text);
             await client.chat.postMessage({ channel, thread_ts, text: clean });
             postedByTool = true;
+            if (invokedDbQuery) postedAfterQuery = true;
             return { ok: true };
           },
         }),
       },
     });
-    await strict.text; // ensure completion
+    await strict.text;
   }
 }
 
