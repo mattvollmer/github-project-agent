@@ -6,17 +6,21 @@
   "scripts": {
     "test": "vitest run",
     "test:core": "vitest run tests/contract.spec.ts tests/scenario.spec.ts",
-    "test:e2e": "vitest run tests/e2e_nl_sql.spec.ts"
+    "test:e2e": "vitest run tests/e2e_nl_sql.spec.ts",
+    "start:slack": "bun slack.ts",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "ai": "^5.0.44",
     "blink": "^0.1.19",
     "esbuild": "^0.25.9",
     "pg": "^8.13.0",
-    "zod": "^4.1.8"
+    "zod": "^4.1.8",
+    "@slack/bolt": "^3.22.0"
   },
   "devDependencies": {
     "@types/node": "^24.4.0",
+    "prettier": "^3.3.3",
     "vitest": "^2.0.0"
   }
 }
