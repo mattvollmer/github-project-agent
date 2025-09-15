@@ -93,36 +93,68 @@ function cleanMention(text: string, botUserId?: string): string {
 }
 
 app.event("app_mention", async ({ event, client, logger, context }) => {
+  const botUserId = context.botUserId as string | undefined;
+  const userText = cleanMention((event as any).text || "", botUserId);
+  const channel = event.channel as string;
+  const ts = (event as any).ts as string;
+
   try {
-    const botUserId = context.botUserId as string | undefined;
-    const userText = cleanMention((event as any).text || "", botUserId);
-    const channel = event.channel;
-    const ts = (event as any).ts;
+    // Add thinking face reaction
+    try {
+      await client.reactions.add({ channel, name: REACTION, timestamp: ts });
+    } catch (err) {
+      logger.warn({ err }, "failed_to_add_reaction");
+    }
+
     const answer = stripMonocle(await runAgentOnce(userText));
+
+    // Post a message as a reply
     await client.chat.postMessage({
-      channel: event.channel,
+      channel,
       text: stripMonocle(answer),
       mrkdwn: true as any,
       thread_ts: (event as any).thread_ts || (event as any).ts,
     });
   } catch (err) {
     logger.error(err);
+  } finally {
+    // Ensure the reaction is removed
+    try {
+      await client.reactions.remove({ channel, name: REACTION, timestamp: ts });
+    } catch (err) {
+      logger.warn({ err }, "failed_to_remove_reaction");
+    }
   }
 });
 
 app.event("message", async ({ event, client, logger }) => {
+  const e: any = event;
+  if (e.channel_type !== "im" || e.subtype) return;
+  const channel = e.channel as string;
+  const ts = e.ts as string;
+
   try {
-    const e: any = event;
-    if (e.channel_type !== "im" || e.subtype) return;
+    try {
+      await client.reactions.add({ channel, name: REACTION, timestamp: ts });
+    } catch (err) {
+      logger.warn({ err }, "failed_to_add_reaction");
+    }
+
     const answer = stripMonocle(await runAgentOnce(e.text || ""));
     await client.chat.postMessage({
-      channel: e.channel,
+      channel,
       text: stripMonocle(answer),
       mrkdwn: true as any,
       thread_ts: e.thread_ts || e.ts,
     });
   } catch (err) {
     logger.error(err);
+  } finally {
+    try {
+      await client.reactions.remove({ channel, name: REACTION, timestamp: ts });
+    } catch (err) {
+      logger.warn({ err }, "failed_to_remove_reaction");
+    }
   }
 });
 
