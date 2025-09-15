@@ -20,6 +20,8 @@ const app = new App({
   logLevel: LogLevel.INFO,
 });
 
+const REACTION = "face_with_monocle"; // 🧐
+
 async function runAgentOnce(userText: string): Promise<string> {
   const res = await generateText({
     model: "anthropic/claude-sonnet-4",
@@ -54,7 +56,13 @@ async function runAgentOnce(userText: string): Promise<string> {
             .default(15000),
         }),
         execute: async ({ sql, params, limit, offset, timeoutMs }) => {
-          const result = await runQuery({ sql, params, limit, offset, timeoutMs });
+          const result = await runQuery({
+            sql,
+            params,
+            limit,
+            offset,
+            timeoutMs,
+          });
           return result;
         },
       }),
@@ -77,6 +85,13 @@ app.event("app_mention", async ({ event, client, logger, context }) => {
   try {
     const botUserId = context.botUserId as string | undefined;
     const userText = cleanMention((event as any).text || "", botUserId);
+    const channel = event.channel;
+    const ts = (event as any).ts;
+    try {
+      await client.reactions.add({ channel, name: REACTION, timestamp: ts });
+    } catch (err) {
+      logger.warn({ err }, "failed_to_add_reaction");
+    }
     const answer = await runAgentOnce(userText);
     await client.chat.postMessage({
       channel: event.channel,
@@ -84,6 +99,11 @@ app.event("app_mention", async ({ event, client, logger, context }) => {
       mrkdwn: true as any,
       thread_ts: (event as any).thread_ts || (event as any).ts,
     });
+    try {
+      await client.reactions.remove({ channel, name: REACTION, timestamp: ts });
+    } catch (err) {
+      logger.warn({ err }, "failed_to_remove_reaction");
+    }
   } catch (err) {
     logger.error(err);
   }
@@ -93,6 +113,13 @@ app.event("message", async ({ event, client, logger }) => {
   try {
     const e: any = event;
     if (e.channel_type !== "im" || e.subtype) return;
+    const channel = e.channel;
+    const ts = e.ts;
+    try {
+      await client.reactions.add({ channel, name: REACTION, timestamp: ts });
+    } catch (err) {
+      logger.warn({ err }, "failed_to_add_reaction");
+    }
     const answer = await runAgentOnce(e.text || "");
     await client.chat.postMessage({
       channel: e.channel,
@@ -100,6 +127,11 @@ app.event("message", async ({ event, client, logger }) => {
       mrkdwn: true as any,
       thread_ts: e.thread_ts || e.ts,
     });
+    try {
+      await client.reactions.remove({ channel, name: REACTION, timestamp: ts });
+    } catch (err) {
+      logger.warn({ err }, "failed_to_remove_reaction");
+    }
   } catch (err) {
     logger.error(err);
   }
