@@ -19,7 +19,8 @@ async function nlToSql(prompt: string): Promise<string> {
     "\n\nAdditional instructions:" +
     "\n- Only respond with a single SQL statement." +
     "\n- Output the SQL inside a fenced code block marked 'sql'." +
-    "\n- Do not include explanations.";
+    "\n- Do not include explanations." +
+    "\n- Do NOT use parameter placeholders like $1, $2. Inline literal values (with proper quoting) directly in the SQL.";
 
   const res = await fetch(`${GATEWAY_BASE}/chat/completions`, {
     method: "POST",
