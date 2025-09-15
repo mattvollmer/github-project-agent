@@ -22,9 +22,17 @@ const app = new App({
 
 const REACTION = "face_with_monocle"; // 🧐
 
+function stripMonocle(input: string): string {
+  return (input || "")
+    .replace(/:face_with_monocle:|:monocle_face:/g, "")
+    .replace(/\u{1F9D0}\uFE0F?/gu, "")
+    .replace(/^\s+/, "")
+    .trim();
+}
+
 async function runAgentOnce(userText: string): Promise<string> {
   if (!userText || userText.trim().length === 0) {
-    return "🧐 Ask me about your GitHub Projects. Examples:\n- what's new in the last 7 days for Project X?\n- list items in Project X with Status = In Progress\n- show all changes for repo owner/repo in Project X";
+    return "Ask me about your GitHub Projects. Examples:\n- what's new in the last 7 days for Project X?\n- list items in Project X with Status = In Progress\n- show all changes for repo owner/repo in Project X";
   }
   const res = await generateText({
     model: "anthropic/claude-sonnet-4",
@@ -72,7 +80,7 @@ async function runAgentOnce(userText: string): Promise<string> {
     },
   });
   const text = res.text || "_No response._";
-  return `🧐 ${text}`;
+  return stripMonocle(text);
 }
 
 function cleanMention(text: string, botUserId?: string): string {
@@ -90,23 +98,13 @@ app.event("app_mention", async ({ event, client, logger, context }) => {
     const userText = cleanMention((event as any).text || "", botUserId);
     const channel = event.channel;
     const ts = (event as any).ts;
-    try {
-      await client.reactions.add({ channel, name: REACTION, timestamp: ts });
-    } catch (err) {
-      logger.warn({ err }, "failed_to_add_reaction");
-    }
-    const answer = await runAgentOnce(userText);
+    const answer = stripMonocle(await runAgentOnce(userText));
     await client.chat.postMessage({
       channel: event.channel,
-      text: answer.replace(/:face_with_monocle:/g, ""), // Remove monocle emoji before sending message
+      text: stripMonocle(answer),
       mrkdwn: true as any,
       thread_ts: (event as any).thread_ts || (event as any).ts,
     });
-    try {
-      await client.reactions.remove({ channel, name: REACTION, timestamp: ts });
-    } catch (err) {
-      logger.warn({ err }, "failed_to_remove_reaction");
-    }
   } catch (err) {
     logger.error(err);
   }
@@ -116,25 +114,13 @@ app.event("message", async ({ event, client, logger }) => {
   try {
     const e: any = event;
     if (e.channel_type !== "im" || e.subtype) return;
-    const channel = e.channel;
-    const ts = e.ts;
-    try {
-      await client.reactions.add({ channel, name: REACTION, timestamp: ts });
-    } catch (err) {
-      logger.warn({ err }, "failed_to_add_reaction");
-    }
-    const answer = await runAgentOnce(e.text || "");
+    const answer = stripMonocle(await runAgentOnce(e.text || ""));
     await client.chat.postMessage({
       channel: e.channel,
-      text: answer,
+      text: stripMonocle(answer),
       mrkdwn: true as any,
       thread_ts: e.thread_ts || e.ts,
     });
-    try {
-      await client.reactions.remove({ channel, name: REACTION, timestamp: ts });
-    } catch (err) {
-      logger.warn({ err }, "failed_to_remove_reaction");
-    }
   } catch (err) {
     logger.error(err);
   }
