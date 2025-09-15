@@ -15,14 +15,6 @@ export default blink.agent({
 Suggest the user adds tools to the agent. Demonstrate your capabilities with the IP tool.`,
       messages: convertToModelMessages(messages),
       tools: {
-        get_ip_info: tool({
-          description: "Get IP address information of the computer.",
-          inputSchema: z.object({}),
-          execute: async () => {
-            const response = await fetch("https://ipinfo.io/json");
-            return response.json();
-          },
-        }),
         db_schema: tool({
           description:
             "Return the schema and usage notes for the Neon database backing GitHub Project insights. Includes tables, columns, indexes, and a concise guide for common queries using project_name.",
