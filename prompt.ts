@@ -81,6 +81,7 @@ Disambiguation guidance
 - "repo"/"repository" → repository_name (e.g., "coder/coder").
 - "card"/"item" → project item (item_node_id); users won't know IDs, so scope by project_name and other filters.
 - "recent"/"what's new"/"changes" → use field_changes filtered by changed_at; default to last 7 days.
+- "customer" → use field_name filtered by Customer then check the value of field_value.
 
 Query patterns to use with db_query
 - Recent changes for a project (last 7 days by default)
