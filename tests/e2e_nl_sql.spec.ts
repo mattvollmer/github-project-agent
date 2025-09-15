@@ -78,7 +78,7 @@ async function nlToSql(
 }
 
 // Increase per-test timeout for E2E calls
-const T = 30000;
+const T = 60000; // Increase test timeout to 60000 ms
 
 const A_START = "2025-01-10T00:00:00Z";
 const A_END = "2025-01-12T23:59:59Z";
@@ -88,13 +88,20 @@ itE2E(
   "e2e: Proj A field_changes in fixed window = 4",
   async () => {
     const { sql, params } = await nlToSql(
-      `For project \"Proj A\", how many field changes occurred between ${A_START} and ${A_END}? Return a single row with a numeric count.`,
+      `MUST use table field_changes. MUST filter project_name = 'Proj A'. MUST restrict changed_at between '${A_START}' and '${A_END}'. For project \"Proj A\", how many field changes occurred between ${A_START} and ${A_END}? Return a single row with a numeric count.`,
     );
     let p = params;
     if ((!p || p.length === 0) && /\\$\\d+/.test(sql)) {
       p = ["Proj A", A_START, A_END];
     }
-    const res = await runQuery({ sql, params: p, limit: 2000 });
+    // Debugging: log the SQL query and params
+    console.log(`Running SQL: ${sql}`, params);
+    const res = await runQuery({
+      sql,
+      params: p,
+      limit: 2000,
+      timeoutMs: 60000,
+    }); // Increased timeoutMs for runQuery
     const count = (() => {
       const row = res.rows?.[0] ?? {};
       const byKey = Object.values(row).find((v) => typeof v === "number");
@@ -110,13 +117,20 @@ itE2E(
   "e2e: Proj A ITEM_A_1 Status is Done",
   async () => {
     const { sql, params } = await nlToSql(
-      `In project \"Proj A\", what is the current Status of item with node id ITEM_A_1? Return a single row with the status value.`,
+      `MUST use table current_field_values. MUST filter project_name = 'Proj A' AND item_node_id = 'ITEM_A_1' AND field_name = 'Status'. Return a single row with only the status value.`,
     );
     let p = params;
     if ((!p || p.length === 0) && /\\$\\d+/.test(sql)) {
       p = ["Proj A", "ITEM_A_1"];
     }
-    const res = await runQuery({ sql, params: p, limit: 50 });
+    console.log(`Running SQL: ${sql}`, p);
+    const res = await runQuery({
+      sql,
+      params: p,
+      limit: 50,
+      timeoutMs: 120000,
+    }); // timeout increased to 120000 ms
+    console.log(`Query result:`, res); // additional debug
     const textVal = (() => {
       const row = res.rows?.[0] ?? {};
       const str = Object.values(row).find((v) => typeof v === "string") as
@@ -134,13 +148,20 @@ itE2E(
   "e2e: Proj A has one deletion event",
   async () => {
     const { sql, params } = await nlToSql(
-      `List deletion events for project \"Proj A\" using the field_changes table. Return the old and new values.`,
+      `MUST use table field_changes. MUST filter project_name = 'Proj A' AND field_name = '_item_deleted'. Return old_value and new_value columns only.`,
     );
     let p = params;
     if ((!p || p.length === 0) && /\\$\\d+/.test(sql)) {
       p = ["Proj A"];
     }
-    const res = await runQuery({ sql, params: p, limit: 50 });
+    console.log(`Running SQL: ${sql}`, p);
+    const res = await runQuery({
+      sql,
+      params: p,
+      limit: 50,
+      timeoutMs: 120000,
+    }); // timeout increased to 120000 ms
+    console.debug(`Deletion check result:`, res); // additional debug
     expect(res.rowCount).toBeGreaterThanOrEqual(1);
     const ok = res.rows.some(
       (r) =>

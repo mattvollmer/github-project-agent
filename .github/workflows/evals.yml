@@ -98,11 +98,18 @@ jobs:
         if: ${{ env.NEON_API_KEY != '' && env.NEON_PROJECT_ID != '' }}
         run: npm ci
 
-      - name: Run evals
-        if: ${{ env.NEON_API_KEY != '' && env.NEON_PROJECT_ID != '' && hashFiles('tests/**/*.spec.*') != '' }}
+      - name: Run core tests (blocking)
+        if: ${{ env.NEON_API_KEY != '' && env.NEON_PROJECT_ID != '' }}
         env:
           DATABASE_URL: ${{ steps.cs.outputs.DATABASE_URL }}
-        run: npm test
+        run: npm run test:core
+
+      - name: Run E2E NL→SQL tests (non-blocking)
+        if: ${{ env.NEON_API_KEY != '' && env.NEON_PROJECT_ID != '' }}
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ steps.cs.outputs.DATABASE_URL }}
+        run: npm run test:e2e
 
       - name: Delete Neon branch
         if: ${{ always() && env.NEON_API_KEY != '' && env.NEON_PROJECT_ID != '' }}

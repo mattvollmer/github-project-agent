@@ -4,7 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:core": "vitest run tests/contract.spec.ts tests/scenario.spec.ts",
+    "test:e2e": "vitest run tests/e2e_nl_sql.spec.ts"
   },
   "dependencies": {
     "ai": "^5.0.44",
