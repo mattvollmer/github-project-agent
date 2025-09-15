@@ -10,7 +10,8 @@ export default blink.agent({
 
   async sendMessages({ messages }) {
     return streamText({
-      model: "openai/gpt-oss-120b",
+      //model: "openai/gpt-oss-120b",
+      model: "anthropic/claude-sonnet-4",
       system: buildSystemPrompt(),
       messages: convertToModelMessages(messages),
       tools: {
