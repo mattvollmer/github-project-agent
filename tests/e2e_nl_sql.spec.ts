@@ -1,3 +1,4 @@
+import { it, expect } from "vitest";
 import { runQuery } from "../db.ts";
 import { buildSystemPrompt } from "../prompt.ts";
 
