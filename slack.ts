@@ -98,7 +98,7 @@ app.event("app_mention", async ({ event, client, logger, context }) => {
     const answer = await runAgentOnce(userText);
     await client.chat.postMessage({
       channel: event.channel,
-      text: answer,
+      text: answer.replace(/:face_with_monocle:/g, ""), // Remove monocle emoji before sending message
       mrkdwn: true as any,
       thread_ts: (event as any).thread_ts || (event as any).ts,
     });
