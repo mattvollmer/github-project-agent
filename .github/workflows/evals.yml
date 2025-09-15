@@ -2,7 +2,7 @@ name: evals
 on:
   workflow_dispatch: {}
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
 
 jobs:
@@ -16,6 +16,7 @@ jobs:
 
       - name: Create Neon branch
         id: create-branch
+        if: ${{ secrets.NEON_API_KEY != '' && vars.NEON_PROJECT_ID != '' }}
         uses: neondatabase/create-branch-action@v6
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
@@ -24,6 +25,7 @@ jobs:
           api_key: ${{ secrets.NEON_API_KEY }}
 
       - name: Install psql, jq, and neonctl
+        if: ${{ secrets.NEON_API_KEY != '' && vars.NEON_PROJECT_ID != '' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client jq
@@ -31,6 +33,7 @@ jobs:
 
       - name: Get DATABASE_URL for the branch
         id: cs
+        if: ${{ secrets.NEON_API_KEY != '' && vars.NEON_PROJECT_ID != '' && steps.create-branch.outcome == 'success' }}
         env:
           NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
           NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
@@ -47,27 +50,30 @@ jobs:
           echo "DATABASE_URL=$CONN" >> "$GITHUB_OUTPUT"
 
       - name: Seed schema and data
+        if: ${{ secrets.NEON_API_KEY != '' && vars.NEON_PROJECT_ID != '' && steps.cs.outputs.DATABASE_URL != '' }}
         env:
           DATABASE_URL: ${{ steps.cs.outputs.DATABASE_URL }}
         run: |
           psql -v ON_ERROR_STOP=1 "$DATABASE_URL" -f tests/schema.sql -f tests/seed.sql
 
       - name: Setup Node
+        if: ${{ secrets.NEON_API_KEY != '' && vars.NEON_PROJECT_ID != '' }}
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install deps
+        if: ${{ secrets.NEON_API_KEY != '' && vars.NEON_PROJECT_ID != '' }}
         run: npm ci
 
       - name: Run evals
-        if: ${{ hashFiles('tests/**/*.spec.*') != '' }}
+        if: ${{ secrets.NEON_API_KEY != '' && vars.NEON_PROJECT_ID != '' && hashFiles('tests/**/*.spec.*') != '' }}
         env:
           DATABASE_URL: ${{ steps.cs.outputs.DATABASE_URL }}
         run: npm test
 
       - name: Delete Neon branch
-        if: always()
+        if: ${{ always() && secrets.NEON_API_KEY != '' && vars.NEON_PROJECT_ID != '' && steps.create-branch.outputs.branch_name != '' }}
         uses: neondatabase/delete-branch-action@v3
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
