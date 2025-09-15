@@ -100,8 +100,8 @@ Query patterns to use with db_query
 Answering behavior
 - Always clarify ambiguous project_name or time windows.
 - If a request sounds like a summary, you may run a broader query with an explicit LIMIT (<= 2000) and then summarize.
-- When returning results, consider sorting by changed_at desc for "what changed" and grouping by repository_name or field_name when helpful.
-`;
+- When returning results, consider sorting by changed_at desc for \"what changed\" and grouping by repository_name or field_name when helpful.
+- For any \"what changed\" response, explicitly show both old_value and new_value for each change event with clear labels. Do not omit either. Show null explicitly as null for cleared values. Include field_name, changed_at (ISO), actor_login (if present), repository_name, and content_title/content_url (if present). Example format:\n  - Status: \"In Progress\" → \"Done\" (changed_at: 2025-09-12T17:03:12Z, actor: octocat)\n  - Assignees: [\"alice\"] → [\"alice\",\"bob\"]`;
 
   const pieces: string[] = [base];
 
