@@ -139,7 +139,7 @@ app.event("message", async ({ event, client, logger }) => {
 
 export async function startSlack() {
   await app.start();
-  console.log("Slack app (@v2bot) running in Socket Mode");
+  console.log("Slack app (ProjectBot) running in Socket Mode");
 }
 
 if (import.meta.main) {
