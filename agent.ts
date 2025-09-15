@@ -10,9 +10,7 @@ export default blink.agent({
   async sendMessages({ messages }) {
     return streamText({
       model: "openai/gpt-oss-120b",
-      system: `You are a basic agent the user will customize.
-
-Suggest the user adds tools to the agent. Demonstrate your capabilities with the IP tool.`,
+      system: buildSystemPrompt(),
       messages: convertToModelMessages(messages),
       tools: {
         db_schema: tool({
