@@ -38,74 +38,53 @@ async function runAgentSession(args: { userText: string; channel: string; thread
     return;
   }
 
+  // Kickoff status so the thread shows activity even if the model stalls
+  await client.chat.postMessage({ channel, thread_ts, text: "Working on it — I’ll reply here with progress and results." });
+
+  let postedAny = false;
+
   try {
     await streamText({
       model: "anthropic/claude-sonnet-4",
       system:
         buildSystemPrompt() +
-        "\n\nSlack behavior:\n- You MAY post brief clarifications or disambiguation via slack_send before any database calls.\n- Once you call db_query, you MUST produce exactly one final results message via slack_send in this run.\n- For results, do not write preambles like \"I'll help you\" — post the answer concisely.\n- If database results are needed, call db_schema/db_query first, then slack_send with the answer.\n- Format for Slack mrkdwn.\n- Do not include monocle emoji in the message text.",
+        "\n\nSlack behavior:\n- You MUST communicate only via the slack_send tool; do NOT return assistant text.\n- Send multiple short messages as needed while you work (clarify, disambiguate, and share progress/results).\n- Keep replies in this thread and concise, formatted for Slack mrkdwn.\n- When finished, send a final message with the answer.\n",
       temperature: 0,
       toolChoice: "auto" as const,
       messages: [{ role: "user", content: userText }],
       tools: {
-        db_schema: tool({
-          description:
-            "Return the schema and usage notes for the Neon database backing GitHub Project insights. Includes tables, columns, indexes, and a concise guide for common queries using project_name.",
-          inputSchema: z.object({}),
-          execute: async () => {
-            const schema = await getSchema();
-            return schema;
-          },
-        }),
+        db_schema: tool({ inputSchema: z.object({}), description: "Return the schema and usage notes for the Neon database backing GitHub Project insights.", execute: async () => getSchema() }),
         db_query: tool({
-          description:
-            "Execute a read-only SQL SELECT against the Neon database. Use project_name for scoping; default lookback is the last 7 days for 'what's new' queries. Returns rows with enforced LIMIT/OFFSET (max 2000).",
+          description: "Execute a read-only SQL SELECT against the Neon database.",
           inputSchema: z.object({
-            sql: z
-              .string()
-              .describe("A single SELECT (or WITH ... SELECT) statement."),
+            sql: z.string().describe("A single SELECT (or WITH ... SELECT) statement."),
             params: z.array(z.any()).optional().default([]),
             limit: z.number().int().min(1).max(2000).optional().default(200),
             offset: z.number().int().min(0).optional().default(0),
-            timeoutMs: z
-              .number()
-              .int()
-              .min(1000)
-              .max(60000)
-              .optional()
-              .default(15000),
+            timeoutMs: z.number().int().min(1000).max(60000).optional().default(15000),
           }),
-          execute: async ({ sql, params, limit, offset, timeoutMs }) => {
-            const result = await runQuery({
-              sql,
-              params,
-              limit,
-              offset,
-              timeoutMs,
-            });
-            return result;
-          },
+          execute: async ({ sql, params, limit, offset, timeoutMs }) => runQuery({ sql, params, limit, offset, timeoutMs }),
         }),
         slack_send: tool({
-          description:
-            "Send a Slack message in the current thread. Use mrkdwn formatting.",
-          inputSchema: z.object({
-            text: z.string().min(1),
-          }),
+          description: "Send a Slack message in the current thread. Use mrkdwn formatting.",
+          inputSchema: z.object({ text: z.string().min(1) }),
           execute: async ({ text }) => {
             const clean = stripMonocle(text);
-            await client.chat.postMessage({
-              channel,
-              thread_ts,
-              text: clean,
-            });
+            await client.chat.postMessage({ channel, thread_ts, text: clean });
+            postedAny = true;
             return { ok: true };
           },
         }),
       },
     });
-  } catch (err) {
-    console.error("Error in runAgentSession:", err);
+  } catch (err: any) {
+    const msg = typeof err?.message === "string" ? err.message.slice(0, 600) : "unexpected_error";
+    await client.chat.postMessage({ channel, thread_ts, text: `Encountered an error while responding: ${msg}` });
+    return;
+  }
+
+  if (!postedAny) {
+    await client.chat.postMessage({ channel, thread_ts, text: "I wasn’t able to produce a response. Please rephrase your request (include the project name and timeframe)." });
   }
 }
 
