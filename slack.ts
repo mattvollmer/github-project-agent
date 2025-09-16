@@ -38,24 +38,25 @@ async function runAgentSession(args: { userText: string; channel: string; thread
     return;
   }
 
-  // Kickoff status so the thread shows activity even if the model stalls
-  await client.chat.postMessage({ channel, thread_ts, text: "Working on it — I’ll reply here with progress and results." });
-
-  let postedAny = false;
+  let currentMessageTs: string | null = null;
+  let accumulatedText = "";
 
   try {
-    await streamText({
+    const result = streamText({
       model: "anthropic/claude-sonnet-4",
-      system:
-        buildSystemPrompt() +
-        "\n\nSlack behavior:\n- You MUST communicate only via the slack_send tool; do NOT return assistant text.\n- Send multiple short messages as needed while you work (clarify, disambiguate, and share progress/results).\n- Keep replies in this thread and concise, formatted for Slack mrkdwn.\n- When finished, send a final message with the answer.\n",
-      temperature: 0,
-      toolChoice: "auto" as const,
+      system: buildSystemPrompt(),
       messages: [{ role: "user", content: userText }],
       tools: {
-        db_schema: tool({ inputSchema: z.object({}), description: "Return the schema and usage notes for the Neon database backing GitHub Project insights.", execute: async () => getSchema() }),
+        db_schema: tool({
+          description: "Return the schema and usage notes for the Neon database backing GitHub Project insights. Includes tables, columns, indexes, and a concise guide for common queries using project_name.",
+          inputSchema: z.object({}),
+          execute: async () => {
+            const schema = await getSchema();
+            return schema;
+          },
+        }),
         db_query: tool({
-          description: "Execute a read-only SQL SELECT against the Neon database.",
+          description: "Execute a read-only SQL SELECT against the Neon database. Use project_name for scoping; default lookback is the last 7 days for 'what's new' queries. Returns rows with enforced LIMIT/OFFSET (max 2000).",
           inputSchema: z.object({
             sql: z.string().describe("A single SELECT (or WITH ... SELECT) statement."),
             params: z.array(z.any()).optional().default([]),
@@ -63,28 +64,60 @@ async function runAgentSession(args: { userText: string; channel: string; thread
             offset: z.number().int().min(0).optional().default(0),
             timeoutMs: z.number().int().min(1000).max(60000).optional().default(15000),
           }),
-          execute: async ({ sql, params, limit, offset, timeoutMs }) => runQuery({ sql, params, limit, offset, timeoutMs }),
-        }),
-        slack_send: tool({
-          description: "Send a Slack message in the current thread. Use mrkdwn formatting.",
-          inputSchema: z.object({ text: z.string().min(1) }),
-          execute: async ({ text }) => {
-            const clean = stripMonocle(text);
-            await client.chat.postMessage({ channel, thread_ts, text: clean });
-            postedAny = true;
-            return { ok: true };
+          execute: async ({ sql, params, limit, offset, timeoutMs }) => {
+            const result = await runQuery({ sql, params, limit, offset, timeoutMs });
+            return result;
           },
         }),
       },
     });
+
+    // Stream the response and update Slack message
+    for await (const delta of result.textStream) {
+      accumulatedText += delta;
+      
+      const clean = stripMonocle(accumulatedText);
+      
+      if (currentMessageTs) {
+        // Update existing message
+        await client.chat.update({
+          channel,
+          ts: currentMessageTs,
+          text: clean,
+        });
+      } else {
+        // Create new message and store its timestamp
+        const response = await client.chat.postMessage({
+          channel,
+          thread_ts,
+          text: clean,
+        });
+        currentMessageTs = response.ts;
+      }
+    }
+
+    // Ensure we have the final text
+    const finalText = await result.text;
+    if (finalText !== accumulatedText) {
+      const clean = stripMonocle(finalText);
+      if (currentMessageTs) {
+        await client.chat.update({
+          channel,
+          ts: currentMessageTs,
+          text: clean,
+        });
+      } else {
+        await client.chat.postMessage({
+          channel,
+          thread_ts,
+          text: clean,
+        });
+      }
+    }
+
   } catch (err: any) {
     const msg = typeof err?.message === "string" ? err.message.slice(0, 600) : "unexpected_error";
-    await client.chat.postMessage({ channel, thread_ts, text: `Encountered an error while responding: ${msg}` });
-    return;
-  }
-
-  if (!postedAny) {
-    await client.chat.postMessage({ channel, thread_ts, text: "I wasn’t able to produce a response. Please rephrase your request (include the project name and timeframe)." });
+    await client.chat.postMessage({ channel, thread_ts, text: `Encountered an error: ${msg}` });
   }
 }
 
