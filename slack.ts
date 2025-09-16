@@ -123,22 +123,53 @@ async function runAgentSession(args: { userText: string; channel: string; thread
     console.log("[DEBUG] Tool results:", toolResults.length);
     console.log("[DEBUG] Final text preview:", finalText.slice(0, 200) + '...');
     
+    // If we have tool results but the text is incomplete, construct a complete response
+    let completeText = finalText;
+    if (toolResults.length > 0 && finalText.length < 200) {
+      console.log("[DEBUG] Text seems incomplete, constructing response from tool results");
+      console.log("[DEBUG] Tool results structure:", JSON.stringify(toolResults, null, 2));
+      
+      // Find the db_query result - cast to any to handle the complex typing
+      const dbQueryResult = (toolResults as any[]).find((r: any) => r.toolName === 'db_query');
+      if (dbQueryResult) {
+        console.log("[DEBUG] Found db_query result:", JSON.stringify(dbQueryResult, null, 2));
+        
+        // Try different property names that might contain the result
+        const resultData = dbQueryResult.result || dbQueryResult.value || dbQueryResult.output || dbQueryResult;
+        const rows = resultData?.rows;
+        
+        if (rows && Array.isArray(rows) && rows.length > 0) {
+          // Check if this looks like a project name query
+          const firstRow = rows[0];
+          if (firstRow && typeof firstRow === 'object' && 'project_name' in firstRow) {
+            const projectNames = rows.map((row: any) => row.project_name).filter(Boolean);
+            completeText = `I found ${projectNames.length} projects in the database:\n\n${projectNames.map((name: string) => `• ${name}`).join('\n')}`;
+          } else {
+            // Generic result display
+            completeText = `Query completed successfully. Found ${rows.length} result(s).\n\nResults:\n${JSON.stringify(rows.slice(0, 5), null, 2)}`;
+          }
+        } else {
+          completeText = "Query executed but no results found or result format unexpected.";
+        }
+      }
+    }
+    
     // Always do a final update with complete results
-    const finalClean = stripMonocle(finalText);
+    const finalClean = stripMonocle(completeText);
     if (currentMessageTs) {
       await client.chat.update({
         channel,
         ts: currentMessageTs,
         text: finalClean,
       });
-      console.log("[DEBUG] Final update completed");
+      console.log("[DEBUG] Final update completed with:", finalClean.slice(0, 100) + '...');
     } else {
       await client.chat.postMessage({
         channel,
         thread_ts,
         text: finalClean,
       });
-      console.log("[DEBUG] Final post completed");
+      console.log("[DEBUG] Final post completed with:", finalClean.slice(0, 100) + '...');
     }
 
     // If no tools were executed but the query suggests they should be, add a follow-up
