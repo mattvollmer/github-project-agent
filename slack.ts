@@ -1,6 +1,6 @@
 import { App, LogLevel } from "@slack/bolt";
 import { z } from "zod";
-import { streamText, tool } from "ai";
+import { generateText, tool } from "ai";
 import { buildSystemPrompt } from "./prompt.js";
 import { getSchema, runQuery } from "./db.js";
 
@@ -41,9 +41,9 @@ async function runAgentSession(args: { userText: string; channel: string; thread
   let toolsExecuted = 0;
 
   try {
-    const result = streamText({
+    const result = await generateText({
       model: "anthropic/claude-sonnet-4",
-      system: buildSystemPrompt(),
+      system: buildSystemPrompt() + "\n\nIMPORTANT: You must complete your analysis and provide a final answer. If you need to query the database, do so and then provide the results. Do not stop after just mentioning what you'll do - actually do it and show the results.",
       messages: [{ role: "user", content: userText }],
       tools: {
         db_schema: tool({
@@ -76,49 +76,13 @@ async function runAgentSession(args: { userText: string; channel: string; thread
       },
     });
 
-    // Wait for complete response - no streaming updates
-    console.log("[DEBUG] Waiting for final text and tool results...");
-    const finalText = await result.text;
-    const toolResults = await result.toolResults;
-    
-    console.log("[DEBUG] Final text length:", finalText.length);
+    console.log("[DEBUG] Final text length:", result.text.length);
     console.log("[DEBUG] Tools executed:", toolsExecuted);
-    console.log("[DEBUG] Tool results:", toolResults.length);
-    console.log("[DEBUG] Final text preview:", finalText.slice(0, 200) + '...');
+    console.log("[DEBUG] Tool results:", result.toolResults.length);
+    console.log("[DEBUG] Final text preview:", result.text.slice(0, 200) + '...');
     
-    // If we have tool results but the text is incomplete, construct a complete response
-    let completeText = finalText;
-    if (toolResults.length > 0 && finalText.length < 200) {
-      console.log("[DEBUG] Text seems incomplete, constructing response from tool results");
-      console.log("[DEBUG] Tool results structure:", JSON.stringify(toolResults, null, 2));
-      
-      // Find the db_query result - cast to any to handle the complex typing
-      const dbQueryResult = (toolResults as any[]).find((r: any) => r.toolName === 'db_query');
-      if (dbQueryResult) {
-        console.log("[DEBUG] Found db_query result:", JSON.stringify(dbQueryResult, null, 2));
-        
-        // Try different property names that might contain the result
-        const resultData = dbQueryResult.result || dbQueryResult.value || dbQueryResult.output || dbQueryResult;
-        const rows = resultData?.rows;
-        
-        if (rows && Array.isArray(rows) && rows.length > 0) {
-          // Check if this looks like a project name query
-          const firstRow = rows[0];
-          if (firstRow && typeof firstRow === 'object' && 'project_name' in firstRow) {
-            const projectNames = rows.map((row: any) => row.project_name).filter(Boolean);
-            completeText = `I found ${projectNames.length} projects in the database:\n\n${projectNames.map((name: string) => `• ${name}`).join('\n')}`;
-          } else {
-            // Generic result display
-            completeText = `Query completed successfully. Found ${rows.length} result(s).\n\nResults:\n${JSON.stringify(rows.slice(0, 5), null, 2)}`;
-          }
-        } else {
-          completeText = "Query executed but no results found or result format unexpected.";
-        }
-      }
-    }
-    
-    // Post single complete message
-    const finalClean = stripMonocle(completeText);
+    // Post the complete response
+    const finalClean = stripMonocle(result.text);
     await client.chat.postMessage({
       channel,
       thread_ts,
