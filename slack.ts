@@ -42,8 +42,8 @@ async function runAgentSession(args: { userText: string; channel: string; thread
 
   try {
     const result = await generateText({
-      model: "anthropic/claude-sonnet-4",
-      system: buildSystemPrompt() + "\n\nIMPORTANT: You must complete your analysis and provide a final answer. If you need to query the database, do so and then provide the results. Do not stop after just mentioning what you'll do - actually do it and show the results.",
+      model: "anthropic/claude-3-5-sonnet-20241022",
+      system: "You are a GitHub Projects database analyst. You have access to two tools: db_schema and db_query.\n\nWhen a user asks about projects or changes:\n1. If you need schema info, call db_schema\n2. Then IMMEDIATELY call db_query with the appropriate SQL\n3. Format the results clearly\n\nDo NOT stop after calling db_schema - always follow through with db_query to get actual data.\n\nFor 'what changed' questions, query the field_changes table with:\nSELECT field_name, old_value, new_value, changed_at, actor_login, content_title, repository_name FROM field_changes WHERE project_name = ? AND changed_at >= now() - interval '7 days' ORDER BY changed_at DESC\n\n" + buildSystemPrompt(),
       messages: [{ role: "user", content: userText }],
       tools: {
         db_schema: tool({
