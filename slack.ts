@@ -85,38 +85,59 @@ async function runAgentSession(args: { userText: string; channel: string; thread
     let finalResponse = result.text;
     if (result.toolResults.length > 0 && result.text.length < 300) {
       console.log("[DEBUG] Text seems incomplete, constructing from tool results");
+      console.log("[DEBUG] Tool results structure:", JSON.stringify(result.toolResults, null, 2));
       
       const dbQueryResult = result.toolResults.find((r: any) => r.toolName === 'db_query');
-      if (dbQueryResult && (dbQueryResult as any).result && (dbQueryResult as any).result.rows) {
-        const rows = (dbQueryResult as any).result.rows;
-        console.log("[DEBUG] Found", rows.length, "rows in db_query result");
+      console.log("[DEBUG] Found dbQueryResult:", !!dbQueryResult);
+      
+      if (dbQueryResult) {
+        console.log("[DEBUG] dbQueryResult keys:", Object.keys(dbQueryResult));
         
-        if (rows.length > 0) {
-          const projectName = rows[0].project_name || 'v2';
-          finalResponse = `Found ${rows.length} recent changes in the "${projectName}" project:\n\n`;
+        // Try different property paths
+        const resultData = (dbQueryResult as any).result || (dbQueryResult as any).output || (dbQueryResult as any).value;
+        console.log("[DEBUG] Found resultData:", !!resultData);
+        
+        if (resultData) {
+          console.log("[DEBUG] resultData keys:", Object.keys(resultData));
+          const rows = resultData.rows;
+          console.log("[DEBUG] Found", rows?.length || 0, "rows in db_query result");
           
-          // Format first 10 changes
-          const changes = rows.slice(0, 10).map((row: any) => {
-            const date = new Date(row.changed_at).toLocaleDateString();
-            const time = new Date(row.changed_at).toLocaleTimeString();
-            const field = row.field_name;
-            const oldVal = row.old_value ? JSON.stringify(row.old_value) : 'null';
-            const newVal = row.new_value ? JSON.stringify(row.new_value) : 'null';
-            const actor = row.actor_login || 'unknown';
-            const title = row.content_title || 'untitled';
-            const repo = row.repository_name || 'unknown';
+          if (rows && rows.length > 0) {
+            console.log("[DEBUG] First row sample:", JSON.stringify(rows[0], null, 2));
             
-            return `• **${field}** changed from ${oldVal} to ${newVal}\n  ${title} in ${repo}\n  by ${actor} on ${date} at ${time}`;
-          }).join('\n\n');
-          
-          finalResponse += changes;
-          
-          if (rows.length > 10) {
-            finalResponse += `\n\n... and ${rows.length - 10} more changes`;
+            const projectName = rows[0].project_name || 'v2';
+            finalResponse = `Found ${rows.length} recent changes in projects with "v2" in the name:\n\n`;
+            
+            // Format first 10 changes
+            const changes = rows.slice(0, 10).map((row: any) => {
+              const date = new Date(row.changed_at).toLocaleDateString();
+              const time = new Date(row.changed_at).toLocaleTimeString();
+              const field = row.field_name;
+              const oldVal = row.old_value ? JSON.stringify(row.old_value) : 'null';
+              const newVal = row.new_value ? JSON.stringify(row.new_value) : 'null';
+              const actor = row.actor_login || 'unknown';
+              const title = row.content_title || 'untitled';
+              const repo = row.repository_name || 'unknown';
+              
+              return `• **${field}** changed from ${oldVal} to ${newVal}\n  ${title} in ${repo}\n  by ${actor} on ${date} at ${time}`;
+            }).join('\n\n');
+            
+            finalResponse += changes;
+            
+            if (rows.length > 10) {
+              finalResponse += `\n\n... and ${rows.length - 10} more changes`;
+            }
+            
+            console.log("[DEBUG] Constructed response length:", finalResponse.length);
+          } else {
+            finalResponse = `No recent changes found in projects with "v2" in the name in the last 7 days.`;
+            console.log("[DEBUG] No rows found, using no-results message");
           }
         } else {
-          finalResponse = `No recent changes found in the "v2" project in the last 7 days.`;
+          console.log("[DEBUG] No resultData found in dbQueryResult");
         }
+      } else {
+        console.log("[DEBUG] No db_query result found in tool results");
       }
     }
     
