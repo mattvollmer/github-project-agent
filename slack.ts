@@ -40,6 +40,7 @@ async function runAgentSession(args: { userText: string; channel: string; thread
 
   let currentMessageTs: string | null = null;
   let accumulatedText = "";
+  let toolsExecuted = 0;
 
   try {
     const result = streamText({
@@ -51,6 +52,8 @@ async function runAgentSession(args: { userText: string; channel: string; thread
           description: "Return the schema and usage notes for the Neon database backing GitHub Project insights. Includes tables, columns, indexes, and a concise guide for common queries using project_name.",
           inputSchema: z.object({}),
           execute: async () => {
+            console.log("[DEBUG] Executing db_schema tool");
+            toolsExecuted++;
             const schema = await getSchema();
             return schema;
           },
@@ -65,7 +68,10 @@ async function runAgentSession(args: { userText: string; channel: string; thread
             timeoutMs: z.number().int().min(1000).max(60000).optional().default(15000),
           }),
           execute: async ({ sql, params, limit, offset, timeoutMs }) => {
+            console.log("[DEBUG] Executing db_query tool with SQL:", sql);
+            toolsExecuted++;
             const result = await runQuery({ sql, params, limit, offset, timeoutMs });
+            console.log("[DEBUG] db_query returned", result.rows?.length || 0, "rows");
             return result;
           },
         }),
@@ -80,11 +86,15 @@ async function runAgentSession(args: { userText: string; channel: string; thread
       
       if (currentMessageTs) {
         // Update existing message
-        await client.chat.update({
-          channel,
-          ts: currentMessageTs,
-          text: clean,
-        });
+        try {
+          await client.chat.update({
+            channel,
+            ts: currentMessageTs,
+            text: clean,
+          });
+        } catch (updateErr) {
+          console.warn("[DEBUG] Failed to update message:", updateErr);
+        }
       } else {
         // Create new message and store its timestamp
         const response = await client.chat.postMessage({
@@ -96,8 +106,14 @@ async function runAgentSession(args: { userText: string; channel: string; thread
       }
     }
 
-    // Ensure we have the final text
+    // Wait for final result and any remaining tool executions
     const finalText = await result.text;
+    const toolResults = await result.toolResults;
+    
+    console.log("[DEBUG] Final text length:", finalText.length);
+    console.log("[DEBUG] Tools executed:", toolsExecuted);
+    console.log("[DEBUG] Tool results:", toolResults.length);
+    
     if (finalText !== accumulatedText) {
       const clean = stripMonocle(finalText);
       if (currentMessageTs) {
@@ -115,7 +131,17 @@ async function runAgentSession(args: { userText: string; channel: string; thread
       }
     }
 
+    // If no tools were executed but the query suggests they should be, add a follow-up
+    if (toolsExecuted === 0 && (userText.toLowerCase().includes('project') || userText.toLowerCase().includes('database'))) {
+      await client.chat.postMessage({
+        channel,
+        thread_ts,
+        text: `[Debug] No database tools were executed. Tools available: db_schema, db_query. Please be more specific about what data you need.`,
+      });
+    }
+
   } catch (err: any) {
+    console.error("[DEBUG] Error in runAgentSession:", err);
     const msg = typeof err?.message === "string" ? err.message.slice(0, 600) : "unexpected_error";
     await client.chat.postMessage({ channel, thread_ts, text: `Encountered an error: ${msg}` });
   }
