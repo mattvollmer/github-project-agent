@@ -38,8 +38,6 @@ async function runAgentSession(args: { userText: string; channel: string; thread
     return;
   }
 
-  let currentMessageTs: string | null = null;
-  let accumulatedText = "";
   let toolsExecuted = 0;
 
   try {
@@ -78,42 +76,7 @@ async function runAgentSession(args: { userText: string; channel: string; thread
       },
     });
 
-    // Stream the response and update Slack message
-    let lastUpdateTime = Date.now();
-    const updateThrottle = 1000; // Update at most once per second
-    
-    for await (const delta of result.textStream) {
-      accumulatedText += delta;
-      
-      const clean = stripMonocle(accumulatedText);
-      const now = Date.now();
-      
-      // Throttle updates to avoid rate limits
-      if (now - lastUpdateTime >= updateThrottle || delta.includes('\n')) {
-        if (currentMessageTs) {
-          try {
-            await client.chat.update({
-              channel,
-              ts: currentMessageTs,
-              text: clean,
-            });
-            lastUpdateTime = now;
-          } catch (updateErr) {
-            console.warn("[DEBUG] Failed to update message:", updateErr);
-          }
-        } else {
-          const response = await client.chat.postMessage({
-            channel,
-            thread_ts,
-            text: clean,
-          });
-          currentMessageTs = response.ts;
-          lastUpdateTime = now;
-        }
-      }
-    }
-
-    // Critical: Wait for ALL tool results to complete
+    // Wait for complete response - no streaming updates
     console.log("[DEBUG] Waiting for final text and tool results...");
     const finalText = await result.text;
     const toolResults = await result.toolResults;
@@ -154,23 +117,14 @@ async function runAgentSession(args: { userText: string; channel: string; thread
       }
     }
     
-    // Always do a final update with complete results
+    // Post single complete message
     const finalClean = stripMonocle(completeText);
-    if (currentMessageTs) {
-      await client.chat.update({
-        channel,
-        ts: currentMessageTs,
-        text: finalClean,
-      });
-      console.log("[DEBUG] Final update completed with:", finalClean.slice(0, 100) + '...');
-    } else {
-      await client.chat.postMessage({
-        channel,
-        thread_ts,
-        text: finalClean,
-      });
-      console.log("[DEBUG] Final post completed with:", finalClean.slice(0, 100) + '...');
-    }
+    await client.chat.postMessage({
+      channel,
+      thread_ts,
+      text: finalClean,
+    });
+    console.log("[DEBUG] Posted complete message:", finalClean.slice(0, 100) + '...');
 
     // If no tools were executed but the query suggests they should be, add a follow-up
     if (toolsExecuted === 0 && (userText.toLowerCase().includes('project') || userText.toLowerCase().includes('database'))) {
