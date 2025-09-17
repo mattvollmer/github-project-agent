@@ -2,12 +2,10 @@ import { streamText, tool } from "ai";
 import * as blink from "blink";
 import { z } from "zod";
 import { convertToModelMessages } from "ai";
-import { getSchema, runQuery } from "./db.js";
-import { buildSystemPrompt } from "./prompt.js";
+import { getSchema, runQuery } from "./db.ts";
+import { buildSystemPrompt } from "./prompt.ts";
 
 export default blink.agent({
-  displayName: "gh-project-agent",
-
   async sendMessages({ messages }) {
     return streamText({
       //model: "openai/gpt-oss-120b",
