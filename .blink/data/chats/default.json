@@ -295,9 +295,7 @@
           "state": "output-available",
           "input": {
             "sql": "SELECT \n  field_name,\n  field_type,\n  old_value,\n  new_value,\n  changed_at,\n  actor_login,\n  repository_name,\n  content_title,\n  content_url,\n  content_type\nFROM field_changes \nWHERE project_name = $1 \n  AND changed_at >= now() - interval '7 days'\nORDER BY changed_at DESC",
-            "params": [
-              "v2"
-            ],
+            "params": ["v2"],
             "limit": 200,
             "offset": 0,
             "timeoutMs": 15000
@@ -501,9 +499,7 @@
                 "field_name": "assignees",
                 "field_type": "issue_assignees",
                 "old_value": null,
-                "new_value": [
-                  "fioan89"
-                ],
+                "new_value": ["fioan89"],
                 "changed_at": "2025-09-19T08:15:17.504Z",
                 "actor_login": "",
                 "repository_name": "coder/jetbrains-coder",
@@ -615,9 +611,7 @@
                 "field_name": "assignees",
                 "field_type": "issue_assignees",
                 "old_value": [],
-                "new_value": [
-                  "spikecurtis"
-                ],
+                "new_value": ["spikecurtis"],
                 "changed_at": "2025-09-19T08:15:17.504Z",
                 "actor_login": "",
                 "repository_name": "coder/internal",
@@ -714,9 +708,7 @@
                 "field_name": "labels",
                 "field_type": "issue_labels",
                 "old_value": null,
-                "new_value": [
-                  "needs-triage"
-                ],
+                "new_value": ["needs-triage"],
                 "changed_at": "2025-09-19T04:13:27.887Z",
                 "actor_login": "",
                 "repository_name": "coder/coder",
@@ -1028,10 +1020,7 @@
                 "field_name": "labels",
                 "field_type": "issue_labels",
                 "old_value": null,
-                "new_value": [
-                  "cli",
-                  "parameters"
-                ],
+                "new_value": ["cli", "parameters"],
                 "changed_at": "2025-09-18T20:12:49.238Z",
                 "actor_login": "",
                 "repository_name": "coder/coder",
@@ -1188,9 +1177,7 @@
                 "field_name": "labels",
                 "field_type": "issue_labels",
                 "old_value": null,
-                "new_value": [
-                  "needs-triage"
-                ],
+                "new_value": ["needs-triage"],
                 "changed_at": "2025-09-18T16:12:46.590Z",
                 "actor_login": "",
                 "repository_name": "coder/coder",
@@ -1346,9 +1333,7 @@
                 "field_name": "assignees",
                 "field_type": "issue_assignees",
                 "old_value": [],
-                "new_value": [
-                  "BrunoQuaresma"
-                ],
+                "new_value": ["BrunoQuaresma"],
                 "changed_at": "2025-09-18T16:12:46.590Z",
                 "actor_login": "",
                 "repository_name": "coder/coder",
@@ -1408,9 +1393,7 @@
                 "field_name": "labels",
                 "field_type": "issue_labels",
                 "old_value": null,
-                "new_value": [
-                  "flake"
-                ],
+                "new_value": ["flake"],
                 "changed_at": "2025-09-18T12:20:12.346Z",
                 "actor_login": "",
                 "repository_name": "coder/internal",
@@ -1422,9 +1405,7 @@
                 "field_name": "assignees",
                 "field_type": "issue_assignees",
                 "old_value": null,
-                "new_value": [
-                  "ibetitsmike"
-                ],
+                "new_value": ["ibetitsmike"],
                 "changed_at": "2025-09-18T12:20:12.346Z",
                 "actor_login": "",
                 "repository_name": "coder/internal",
@@ -1508,10 +1489,7 @@
                 "field_name": "labels",
                 "field_type": "issue_labels",
                 "old_value": null,
-                "new_value": [
-                  "needs-triage",
-                  "prebuilds"
-                ],
+                "new_value": ["needs-triage", "prebuilds"],
                 "changed_at": "2025-09-18T12:20:12.346Z",
                 "actor_login": "",
                 "repository_name": "coder/coder",
@@ -1595,10 +1573,7 @@
                 "field_name": "labels",
                 "field_type": "issue_labels",
                 "old_value": null,
-                "new_value": [
-                  "needs-triage",
-                  "prebuilds"
-                ],
+                "new_value": ["needs-triage", "prebuilds"],
                 "changed_at": "2025-09-18T12:20:12.346Z",
                 "actor_login": "",
                 "repository_name": "coder/coder",
@@ -1735,9 +1710,7 @@
                 "field_name": "labels",
                 "field_type": "issue_labels",
                 "old_value": null,
-                "new_value": [
-                  "needs-triage"
-                ],
+                "new_value": ["needs-triage"],
                 "changed_at": "2025-09-18T08:15:28.117Z",
                 "actor_login": "",
                 "repository_name": "coder/coder",
@@ -2555,9 +2528,7 @@
                 "field_name": "assignees",
                 "field_type": "issue_assignees",
                 "old_value": [],
-                "new_value": [
-                  "ThomasK33"
-                ],
+                "new_value": ["ThomasK33"],
                 "changed_at": "2025-09-17T20:12:18.224Z",
                 "actor_login": "",
                 "repository_name": "coder/coder",
@@ -2618,9 +2589,7 @@
                 "field_name": "assignees",
                 "field_type": "issue_assignees",
                 "old_value": [],
-                "new_value": [
-                  "ThomasK33"
-                ],
+                "new_value": ["ThomasK33"],
                 "changed_at": "2025-09-17T20:12:18.224Z",
                 "actor_login": "",
                 "repository_name": "coder/coder",
@@ -2948,9 +2917,7 @@
           "state": "output-error",
           "input": {
             "sql": "SELECT \n  field_name,\n  old_value,\n  new_value,\n  changed_at,\n  repository_name,\n  content_title,\n  content_url\nFROM field_changes \nWHERE project_name = $1 \n  AND changed_at >= now() - interval '7 days'\n  AND field_name = 'Status'\n  AND field_type = 'ProjectV2ItemFieldSingleSelectValue'\n  AND (\n    -- Items moving backwards in the workflow\n    (old_value = 'In Progress' AND new_value IN ('📚 Backlog', 'To Do'))\n    OR (old_value = 'In Review' AND new_value IN ('📚 Backlog', 'To Do', 'In Progress'))\n    OR (old_value = 'To Do' AND new_value = '📚 Backlog')\n    -- Items getting blocked\n    OR new_value = '🛑 Blocked'\n  )\nORDER BY changed_at DESC",
-            "params": [
-              "v2"
-            ],
+            "params": ["v2"],
             "limit": 50,
             "offset": 0,
             "timeoutMs": 15000
@@ -2978,9 +2945,7 @@
           "state": "output-available",
           "input": {
             "sql": "SELECT \n  field_name,\n  old_value,\n  new_value,\n  changed_at,\n  repository_name,\n  content_title,\n  content_url\nFROM field_changes \nWHERE project_name = $1 \n  AND changed_at >= now() - interval '7 days'\n  AND field_name = 'Status'\n  AND field_type = 'ProjectV2ItemFieldSingleSelectValue'\n  AND (\n    -- Items moving backwards in the workflow\n    (old_value::text = '\"In Progress\"' AND new_value::text IN ('\"📚 Backlog\"', '\"To Do\"'))\n    OR (old_value::text = '\"In Review\"' AND new_value::text IN ('\"📚 Backlog\"', '\"To Do\"', '\"In Progress\"'))\n    OR (old_value::text = '\"To Do\"' AND new_value::text = '\"📚 Backlog\"')\n    -- Items getting blocked\n    OR new_value::text = '\"🛑 Blocked\"'\n  )\nORDER BY changed_at DESC",
-            "params": [
-              "v2"
-            ],
+            "params": ["v2"],
             "limit": 50,
             "offset": 0,
             "timeoutMs": 15000
@@ -3032,9 +2997,7 @@
           "state": "output-error",
           "input": {
             "sql": "SELECT \n  field_name,\n  old_value,\n  new_value,\n  changed_at,\n  repository_name,\n  content_title,\n  content_url,\n  actor_login\nFROM field_changes \nWHERE project_name = $1 \n  AND changed_at >= now() - interval '7 days'\n  AND (\n    -- Look for assignee removals (potential deprioritization)\n    (field_name = 'assignees' AND array_length(COALESCE(old_value::jsonb, '[]'::jsonb), 1) > array_length(COALESCE(new_value::jsonb, '[]'::jsonb), 1))\n    -- Look for items being moved to blocked status\n    OR (field_name = 'Status' AND new_value::text = '\"🛑 Blocked\"')\n    -- Look for any other status movements that indicate delays\n    OR (field_name = 'Status' AND old_value::text IN ('\"In Progress\"', '\"In Review\"') AND new_value::text NOT IN ('\"Done\"'))\n  )\nORDER BY changed_at DESC",
-            "params": [
-              "v2"
-            ],
+            "params": ["v2"],
             "limit": 20,
             "offset": 0,
             "timeoutMs": 15000
@@ -3062,9 +3025,7 @@
           "state": "output-available",
           "input": {
             "sql": "SELECT \n  field_name,\n  old_value,\n  new_value,\n  changed_at,\n  repository_name,\n  content_title,\n  content_url\nFROM field_changes \nWHERE project_name = $1 \n  AND changed_at >= now() - interval '7 days'\n  AND field_name = 'Status'\n  AND field_type = 'ProjectV2ItemFieldSingleSelectValue'\n  AND new_value::text = '\"🛑 Blocked\"'\nORDER BY changed_at DESC",
-            "params": [
-              "v2"
-            ],
+            "params": ["v2"],
             "limit": 20,
             "offset": 0,
             "timeoutMs": 15000
@@ -3142,9 +3103,7 @@
           "state": "output-available",
           "input": {
             "sql": "SELECT DISTINCT field_name, field_type\nFROM current_field_values \nWHERE project_name = $1 \n  AND (field_name ILIKE '%iteration%' \n       OR field_name ILIKE '%sprint%' \n       OR field_name ILIKE '%cycle%'\n       OR field_type ILIKE '%iteration%')\nORDER BY field_name",
-            "params": [
-              "v2"
-            ],
+            "params": ["v2"],
             "limit": 20,
             "offset": 0,
             "timeoutMs": 15000
@@ -3186,9 +3145,7 @@
           "state": "output-available",
           "input": {
             "sql": "SELECT \n  field_value,\n  COUNT(*) as item_count,\n  MAX(updated_at) as last_updated\nFROM current_field_values \nWHERE project_name = $1 \n  AND field_name = 'Sprint'\n  AND field_value IS NOT NULL\nGROUP BY field_value\nORDER BY last_updated DESC",
-            "params": [
-              "v2"
-            ],
+            "params": ["v2"],
             "limit": 10,
             "offset": 0,
             "timeoutMs": 15000
@@ -3272,9 +3229,7 @@
           "state": "output-available",
           "input": {
             "sql": "SELECT \n  old_value,\n  new_value,\n  changed_at,\n  content_title,\n  repository_name\nFROM field_changes \nWHERE project_name = $1 \n  AND field_name = 'Sprint'\n  AND changed_at >= now() - interval '7 days'\nORDER BY changed_at DESC\nLIMIT 10",
-            "params": [
-              "v2"
-            ],
+            "params": ["v2"],
             "limit": 10,
             "offset": 0,
             "timeoutMs": 15000
@@ -3404,9 +3359,7 @@
           "state": "output-available",
           "input": {
             "sql": "SELECT \n  old_value,\n  new_value,\n  changed_at,\n  content_title,\n  repository_name,\n  content_url\nFROM field_changes \nWHERE project_name = $1 \n  AND field_name = 'Sprint'\n  AND changed_at >= now() - interval '7 days'\n  AND (\n    old_value::text = '\"XLIII\"' \n    OR new_value::text = '\"XLIV\"'\n  )\nORDER BY changed_at DESC",
-            "params": [
-              "v2"
-            ],
+            "params": ["v2"],
             "limit": 20,
             "offset": 0,
             "timeoutMs": 15000
@@ -3488,9 +3441,7 @@
           "state": "output-available",
           "input": {
             "sql": "SELECT \n  field_value,\n  COUNT(*) as item_count,\n  MAX(updated_at) as last_updated\nFROM current_field_values \nWHERE project_name = $1 \n  AND field_name = 'Sprint'\n  AND field_value::text = '\"XLIV\"'\nGROUP BY field_value",
-            "params": [
-              "v2"
-            ],
+            "params": ["v2"],
             "limit": 5,
             "offset": 0,
             "timeoutMs": 15000
@@ -3523,9 +3474,7 @@
           "state": "output-available",
           "input": {
             "sql": "SELECT \n  old_value,\n  new_value,\n  changed_at,\n  content_title,\n  repository_name,\n  content_url\nFROM field_changes \nWHERE project_name = $1 \n  AND field_name = 'Sprint'\n  AND changed_at >= now() - interval '7 days'\nORDER BY changed_at DESC",
-            "params": [
-              "v2"
-            ],
+            "params": ["v2"],
             "limit": 20,
             "offset": 0,
             "timeoutMs": 15000
