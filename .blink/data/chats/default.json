@@ -1,22 +1,22 @@
 {
   "id": "default",
-  "created_at": "2025-09-19T19:35:09.329Z",
-  "updated_at": "2025-09-19T19:35:12.056Z",
+  "created_at": "2025-09-19T20:25:22.218Z",
+  "updated_at": "2025-09-19T20:25:33.270Z",
   "messages": [
     {
-      "created_at": "2025-09-19T19:35:12.056Z",
+      "created_at": "2025-09-19T20:25:28.143Z",
       "role": "user",
       "parts": [
         {
           "type": "text",
-          "text": "what's your name"
+          "text": "what changed today?"
         }
       ],
-      "id": "2fed5b29-a684-44f2-95db-19f9c4aa889c"
+      "id": "72bee2dc-5c9b-44d0-bd9a-68c4f6f2f5e0"
     },
     {
-      "created_at": "2025-09-19T19:35:15.603Z",
-      "id": "5952aca5-4c26-49b5-8807-68df4323d236",
+      "created_at": "2025-09-19T20:25:33.246Z",
+      "id": "0feb2b23-bd30-420f-9ffc-6e0dfddc27e9",
       "role": "assistant",
       "parts": [
         {
@@ -24,7 +24,1164 @@
         },
         {
           "type": "text",
-          "text": "My name is Gitty! I'm an agent that helps answer questions about GitHub Projects using a Neon Postgres database. I can help you explore project data, track changes, analyze field values, and answer questions about what's happening in your GitHub Projects.\n\nIs there anything specific about your GitHub Projects that you'd like to know about?",
+          "text": "I'll check what changed today in the default \"v2\" project. Let me query the recent changes from today.",
+          "state": "done"
+        },
+        {
+          "type": "tool-db_query",
+          "toolCallId": "toolu_014FDWAXP5XRboTsn1YKpNSv",
+          "state": "output-available",
+          "input": {
+            "sql": "SELECT \n  field_name,\n  old_value,\n  new_value,\n  changed_at,\n  actor_login,\n  repository_name,\n  content_title,\n  content_url,\n  field_type\nFROM field_changes \nWHERE project_name = $1 \n  AND changed_at >= CURRENT_DATE\nORDER BY changed_at DESC",
+            "params": [
+              "v2"
+            ],
+            "limit": 200,
+            "offset": 0,
+            "timeoutMs": 15000
+          },
+          "output": {
+            "rowCount": 92,
+            "rows": [
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-15T15:27:42Z",
+                "new_value": "2025-09-19T20:05:29Z",
+                "changed_at": "2025-09-19T20:15:23.378Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "Add `shared_with_group:` and `shared_with_user:` filters to /workspaces endpoint",
+                "content_url": "https://github.com/coder/internal/issues/1004",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "state",
+                "old_value": "OPEN",
+                "new_value": "CLOSED",
+                "changed_at": "2025-09-19T20:15:23.378Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "Add `shared_with_group:` and `shared_with_user:` filters to /workspaces endpoint",
+                "content_url": "https://github.com/coder/internal/issues/1004",
+                "field_type": "issue_state"
+              },
+              {
+                "field_name": "Status",
+                "old_value": "In Review",
+                "new_value": "Done",
+                "changed_at": "2025-09-19T20:15:23.378Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "Add `shared_with_group:` and `shared_with_user:` filters to /workspaces endpoint",
+                "content_url": "https://github.com/coder/internal/issues/1004",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "labels",
+                "old_value": null,
+                "new_value": [
+                  "project/tasks"
+                ],
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Task doesn't appear in the task list",
+                "content_url": "https://github.com/coder/coder/issues/19894",
+                "field_type": "issue_labels"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": null,
+                "new_value": "2025-09-19T17:14:44Z",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Task doesn't appear in the task list",
+                "content_url": "https://github.com/coder/coder/issues/19894",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "created_at",
+                "old_value": null,
+                "new_value": "2025-09-19T17:14:44Z",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Task doesn't appear in the task list",
+                "content_url": "https://github.com/coder/coder/issues/19894",
+                "field_type": "issue_created_at"
+              },
+              {
+                "field_name": "state",
+                "old_value": null,
+                "new_value": "OPEN",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Task doesn't appear in the task list",
+                "content_url": "https://github.com/coder/coder/issues/19894",
+                "field_type": "issue_state"
+              },
+              {
+                "field_name": "body",
+                "old_value": null,
+                "new_value": "I’m noticing that when I create a new task, it doesn’t appear in the task list. My guess is that the workspace isn’t reporting an agent status. This might be resolved by using the experimental Tasks API.\n\n**Task created**\n<img width=\"1512\" height=\"729\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/181122f2-9a64-45c3-bdc2-00aa0aa01098\" />\n\n**Task not being displayed** \n<img width=\"1512\" height=\"736\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/4c15d530-d286-4dbe-b6ad-eb1ff10497e4\" />",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Task doesn't appear in the task list",
+                "content_url": "https://github.com/coder/coder/issues/19894",
+                "field_type": "issue_body"
+              },
+              {
+                "field_name": "title",
+                "old_value": null,
+                "new_value": "Tasks: Task doesn't appear in the task list",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Task doesn't appear in the task list",
+                "content_url": "https://github.com/coder/coder/issues/19894",
+                "field_type": "issue_title"
+              },
+              {
+                "field_name": "Status",
+                "old_value": null,
+                "new_value": "📚 Backlog",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Task doesn't appear in the task list",
+                "content_url": "https://github.com/coder/coder/issues/19894",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "labels",
+                "old_value": null,
+                "new_value": [
+                  "project/tasks"
+                ],
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Status isn’t being updated correctly",
+                "content_url": "https://github.com/coder/coder/issues/19893",
+                "field_type": "issue_labels"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": null,
+                "new_value": "2025-09-19T17:11:08Z",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Status isn’t being updated correctly",
+                "content_url": "https://github.com/coder/coder/issues/19893",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "created_at",
+                "old_value": null,
+                "new_value": "2025-09-19T17:11:08Z",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Status isn’t being updated correctly",
+                "content_url": "https://github.com/coder/coder/issues/19893",
+                "field_type": "issue_created_at"
+              },
+              {
+                "field_name": "state",
+                "old_value": null,
+                "new_value": "OPEN",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Status isn’t being updated correctly",
+                "content_url": "https://github.com/coder/coder/issues/19893",
+                "field_type": "issue_state"
+              },
+              {
+                "field_name": "body",
+                "old_value": null,
+                "new_value": "When I run a task, the list shows the agent status as “Idle” even though it’s running. It looks like the status isn’t being updated correctly.\n\n**Displayed as idle**\n\n<img width=\"1358\" height=\"91\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/0b673c67-0ef3-4891-8eb8-a68e9ca1500c\" />\n\n**But the task is running**\n\n<img width=\"1512\" height=\"776\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/e69841c7-82d8-4952-ba4d-f7a14268c39d\" />",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Status isn’t being updated correctly",
+                "content_url": "https://github.com/coder/coder/issues/19893",
+                "field_type": "issue_body"
+              },
+              {
+                "field_name": "title",
+                "old_value": null,
+                "new_value": "Tasks: Status isn’t being updated correctly",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Status isn’t being updated correctly",
+                "content_url": "https://github.com/coder/coder/issues/19893",
+                "field_type": "issue_title"
+              },
+              {
+                "field_name": "Status",
+                "old_value": null,
+                "new_value": "📚 Backlog",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Tasks: Status isn’t being updated correctly",
+                "content_url": "https://github.com/coder/coder/issues/19893",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "assignees",
+                "old_value": [],
+                "new_value": [
+                  "rafrdz"
+                ],
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "feat: prompt User to add missing `var` in CLI",
+                "content_url": "https://github.com/coder/coder/issues/19782",
+                "field_type": "issue_assignees"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-15T07:41:13Z",
+                "new_value": "2025-09-19T15:09:53Z",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "feat: prompt User to add missing `var` in CLI",
+                "content_url": "https://github.com/coder/coder/issues/19782",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "assignees",
+                "old_value": [],
+                "new_value": [
+                  "BrunoQuaresma"
+                ],
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Improve task creation UX: avoid auto-redirect to encourage background agent workflow",
+                "content_url": "https://github.com/coder/coder/issues/19675",
+                "field_type": "issue_assignees"
+              },
+              {
+                "field_name": "state",
+                "old_value": "OPEN",
+                "new_value": "CLOSED",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Add warning message to tasks UI",
+                "content_url": "https://github.com/coder/coder/issues/19739",
+                "field_type": "issue_state"
+              },
+              {
+                "field_name": "Status",
+                "old_value": "In Progress",
+                "new_value": "In Review",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "Add `shared_with_group:` and `shared_with_user:` filters to /workspaces endpoint",
+                "content_url": "https://github.com/coder/internal/issues/1004",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-19T11:14:50Z",
+                "new_value": "2025-09-19T15:15:38Z",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "flake: TestServer/CanListenUnspecifiedv4",
+                "content_url": "https://github.com/coder/internal/issues/946",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "Status",
+                "old_value": "To Do",
+                "new_value": "In Progress",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "MCP: Add `coder_*_task` tools",
+                "content_url": "https://github.com/coder/internal/issues/776",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-11T12:58:59Z",
+                "new_value": "2025-09-19T17:23:30Z",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "MCP: Add `coder_*_task` tools",
+                "content_url": "https://github.com/coder/internal/issues/776",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "assignees",
+                "old_value": [],
+                "new_value": [
+                  "code-asher"
+                ],
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "MCP: Add `coder_*_task` tools",
+                "content_url": "https://github.com/coder/internal/issues/776",
+                "field_type": "issue_assignees"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-08T06:50:35Z",
+                "new_value": "2025-09-19T14:29:39Z",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "feature: support OAuth token revocation",
+                "content_url": "https://github.com/coder/coder/issues/15575",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "linked_pull_requests",
+                "old_value": [
+                  {
+                    "repo": "coder/coder",
+                    "state": "CLOSED",
+                    "title": "feat: add API endpoint for retrieving OIDC logout URL",
+                    "number": 17015,
+                    "mergedAt": null
+                  },
+                  {
+                    "repo": "coder/coder",
+                    "state": "OPEN",
+                    "title": "feat: add best effort attempt to revoke oauth access token in external auth provider",
+                    "number": 19775,
+                    "mergedAt": null
+                  }
+                ],
+                "new_value": [
+                  {
+                    "repo": "coder/coder",
+                    "state": "CLOSED",
+                    "title": "feat: add API endpoint for retrieving OIDC logout URL",
+                    "number": 17015,
+                    "mergedAt": null
+                  },
+                  {
+                    "repo": "coder/coder",
+                    "state": "MERGED",
+                    "title": "feat: add best effort attempt to revoke oauth access token in external auth provider",
+                    "number": 19775,
+                    "mergedAt": "2025-09-19T14:27:02Z"
+                  }
+                ],
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "feature: support OAuth token revocation",
+                "content_url": "https://github.com/coder/coder/issues/15575",
+                "field_type": "issue_linked_prs"
+              },
+              {
+                "field_name": "linked_pull_requests",
+                "old_value": [],
+                "new_value": [
+                  {
+                    "repo": "coder/coder-logstream-kube",
+                    "state": "OPEN",
+                    "title": "feat: implement retry mechanism for log processing",
+                    "number": 136,
+                    "mergedAt": null
+                  }
+                ],
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder-logstream-kube",
+                "content_title": "Pod events before container startup are not visible in Coder UI",
+                "content_url": "https://github.com/coder/coder-logstream-kube/issues/119",
+                "field_type": "issue_linked_prs"
+              },
+              {
+                "field_name": "closing_pull_requests",
+                "old_value": [],
+                "new_value": [
+                  {
+                    "repo": "coder/coder-logstream-kube",
+                    "number": 136
+                  }
+                ],
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder-logstream-kube",
+                "content_title": "Pod events before container startup are not visible in Coder UI",
+                "content_url": "https://github.com/coder/coder-logstream-kube/issues/119",
+                "field_type": "issue_closing_prs"
+              },
+              {
+                "field_name": "Status",
+                "old_value": "In Progress",
+                "new_value": "Done",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Add warning message to tasks UI",
+                "content_url": "https://github.com/coder/coder/issues/19739",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-10T10:56:50Z",
+                "new_value": "2025-09-19T13:49:35Z",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Add warning message to tasks UI",
+                "content_url": "https://github.com/coder/coder/issues/19739",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "linked_pull_requests",
+                "old_value": [
+                  {
+                    "repo": "coder/coder",
+                    "state": "OPEN",
+                    "title": "feat(site): display warnings in tasks page when wildcard is not configured",
+                    "number": 19780,
+                    "mergedAt": null
+                  }
+                ],
+                "new_value": [
+                  {
+                    "repo": "coder/coder",
+                    "state": "MERGED",
+                    "title": "feat(site): display warnings in tasks page when wildcard is not configured",
+                    "number": 19780,
+                    "mergedAt": "2025-09-19T13:49:34Z"
+                  }
+                ],
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Add warning message to tasks UI",
+                "content_url": "https://github.com/coder/coder/issues/19739",
+                "field_type": "issue_linked_prs"
+              },
+              {
+                "field_name": "closing_pull_requests",
+                "old_value": [
+                  {
+                    "repo": "coder/coder",
+                    "number": 19780
+                  }
+                ],
+                "new_value": [],
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Add warning message to tasks UI",
+                "content_url": "https://github.com/coder/coder/issues/19739",
+                "field_type": "issue_closing_prs"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-02T14:00:31Z",
+                "new_value": "2025-09-19T16:58:56Z",
+                "changed_at": "2025-09-19T17:36:07.470Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Improve task creation UX: avoid auto-redirect to encourage background agent workflow",
+                "content_url": "https://github.com/coder/coder/issues/19675",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "Status",
+                "old_value": "In Review",
+                "new_value": "Done",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "flake: TestServer/CanListenUnspecifiedv4",
+                "content_url": "https://github.com/coder/internal/issues/946",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "state",
+                "old_value": "OPEN",
+                "new_value": "CLOSED",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "flake: TestServer/CanListenUnspecifiedv4",
+                "content_url": "https://github.com/coder/internal/issues/946",
+                "field_type": "issue_state"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-12T06:28:15Z",
+                "new_value": "2025-09-19T11:14:50Z",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "flake: TestServer/CanListenUnspecifiedv4",
+                "content_url": "https://github.com/coder/internal/issues/946",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "Status",
+                "old_value": "In Progress",
+                "new_value": "In Review",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "Refactor Create workspaces subcommand to split User and Workspace creation",
+                "content_url": "https://github.com/coder/internal/issues/985",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-19T05:59:21Z",
+                "new_value": "2025-09-19T10:37:20Z",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "Create load generator for Dynamic Parameters",
+                "content_url": "https://github.com/coder/internal/issues/912",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "title",
+                "old_value": "CLI to dump audit data in JSON format, partitioned by session",
+                "new_value": "CLI to dump audit data in JSON format, partitioned by interception",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/aibridge",
+                "content_title": "CLI to dump audit data in JSON format, partitioned by interception",
+                "content_url": "https://github.com/coder/aibridge/issues/14",
+                "field_type": "issue_title"
+              },
+              {
+                "field_name": "body",
+                "old_value": "Currently AI bridge does not have UI. We need a way to help operators export the data to the outside world.\n\n`coder aibridge audit dump`\n\nAcceptance criteria:\n- implemented command in the CLI\n- JSON output in the format below\n- all prompts, tokens, tools used in each session\n\n\n```json\n{\n\t\"session_id\": \"...\",\n\t\"user_id\": \"...\",\n\t\"labels\": {},\n\t\"prompt\": \"draw a duck on a bicycle\",\n\t\"tokens\": {},\n\t\"tools\": [\n\t\t{\n\t\t\t\"server\": \"github\",\n\t\t\t\"tool\": \"get_me\"\n\t\t},\n\t\t{\n\t\t\t\"server\": \"\", <-- client-specific tool\n\t\t\t\"tool\": \"Bash\",\n\t\t\t\"args\": {\n\t\t\t\t\"cmd\": \"rm -rf /\"\n\t\t\t}\n\t\t}\n\t]\n}\n```",
+                "new_value": "Currently AI bridge does not have UI. We need a way to help operators export the data to the outside world.\n\n`coder aibridge audit dump`\n\nAcceptance criteria:\n- implemented command in the CLI\n- JSON output in the format below\n- all prompts, tokens, tools used in each interception\n\n\n```json\n{\n\t\"_cursor\": \"<interception_id>\",\n\t\"results\": [\n\t\t{\n\t\t\t\"interception_id\": \"...\",\n\t\t\t\"user_id\": \"...\",\n\t\t\t\"provider\": \"anthropic\",\n\t\t\t\"model\": \"opus-4.1\",\n\t\t\t\"prompt\": \"draw a duck on a bicycle\",\n\t\t\t\"tokens\": {\n\t\t\t\t\"input\": 1000,\n\t\t\t\t\"output\": 20000\n\t\t\t},\n\t\t\t\"tools\": [\n\t\t\t\t{\n\t\t\t\t\t\"server\": \"github\",\n\t\t\t\t\t\"tool\": \"get_me\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"server\": \"\", <-- client-specific tool\n  \t\t\t\t\t\"tool\": \"Bash\",\n\t\t\t\t\t\"args\": {\n\t\t\t\t\t\t\"cmd\": \"rm -rf /\"\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t],\n\t\t\t\"started_at\": \"<ts>\"\n\t\t}\n\t]\n}\n```",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/aibridge",
+                "content_title": "CLI to dump audit data in JSON format, partitioned by interception",
+                "content_url": "https://github.com/coder/aibridge/issues/14",
+                "field_type": "issue_body"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-15T09:56:03Z",
+                "new_value": "2025-09-19T09:12:34Z",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/aibridge",
+                "content_title": "CLI to dump audit data in JSON format, partitioned by interception",
+                "content_url": "https://github.com/coder/aibridge/issues/14",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "body",
+                "old_value": "To supply the information needed for the CLI command we need to add an API endpoint to supply the data.\n\nEndpoint should be added to coderd (should check for experiment & entitlement).\n\nAcceptance criteria:\n- bulk retrieval endpoint supporting paging with filtering (just session for now)\n- ONLY administrators should be able to query this endpoint",
+                "new_value": "To supply the information needed for the CLI command we need to add an API endpoint to supply the data.\n\nEndpoint should be added to coderd (should check for experiment & entitlement).\n\nAcceptance criteria:\n- bulk retrieval endpoint supporting paging with filtering (just interception for now)\n- ONLY administrators should be able to query this endpoint",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/aibridge",
+                "content_title": "Create an API endpoint to export audit data",
+                "content_url": "https://github.com/coder/aibridge/issues/21",
+                "field_type": "issue_body"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-15T14:53:17Z",
+                "new_value": "2025-09-19T08:55:16Z",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/aibridge",
+                "content_title": "Create an API endpoint to export audit data",
+                "content_url": "https://github.com/coder/aibridge/issues/21",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "Status",
+                "old_value": null,
+                "new_value": "📚 Backlog",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "dbpurge: purge expired api keys",
+                "content_url": "https://github.com/coder/coder/issues/19889",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "title",
+                "old_value": null,
+                "new_value": "dbpurge: purge expired api keys",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "dbpurge: purge expired api keys",
+                "content_url": "https://github.com/coder/coder/issues/19889",
+                "field_type": "issue_title"
+              },
+              {
+                "field_name": "body",
+                "old_value": null,
+                "new_value": "Relates to:\n- https://github.com/coder/coder/pull/19725/\n- https://github.com/coder/coder/pull/19667/\n- https://github.com/coder/jetbrains-coder/pull/568\n\n#19725 added an index to reduce the impact of large numbers of API keys on the UI.\n\n#19667 adds logic to dbpurge to expire API keys belonging to the prebuilds user\n\njetbrains-coder#568 fixed an issue with the JetBrains plugin that caused large numbers of API keys to be created.\n\nAs a separate follow-up to this, add logic to `dbpurge` to delete expired API keys created by the JetBrains plugin to reduce the size of the database.",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "dbpurge: purge expired api keys",
+                "content_url": "https://github.com/coder/coder/issues/19889",
+                "field_type": "issue_body"
+              },
+              {
+                "field_name": "state",
+                "old_value": null,
+                "new_value": "OPEN",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "dbpurge: purge expired api keys",
+                "content_url": "https://github.com/coder/coder/issues/19889",
+                "field_type": "issue_state"
+              },
+              {
+                "field_name": "created_at",
+                "old_value": null,
+                "new_value": "2025-09-19T11:02:21Z",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "dbpurge: purge expired api keys",
+                "content_url": "https://github.com/coder/coder/issues/19889",
+                "field_type": "issue_created_at"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": null,
+                "new_value": "2025-09-19T11:03:32Z",
+                "changed_at": "2025-09-19T12:20:57.747Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "dbpurge: purge expired api keys",
+                "content_url": "https://github.com/coder/coder/issues/19889",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "Status",
+                "old_value": "📚 Backlog",
+                "new_value": "In Progress",
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "Refactor Create workspaces subcommand to split User and Workspace creation",
+                "content_url": "https://github.com/coder/internal/issues/985",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "linked_pull_requests",
+                "old_value": [],
+                "new_value": [
+                  {
+                    "repo": "coder/coder",
+                    "state": "OPEN",
+                    "title": "fix: fix for template dormancy hour/day toggle",
+                    "number": 19884,
+                    "mergedAt": null
+                  }
+                ],
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Template dormancy 'hour' setting prevents changing back to 'day'",
+                "content_url": "https://github.com/coder/coder/issues/15451",
+                "field_type": "issue_linked_prs"
+              },
+              {
+                "field_name": "closing_pull_requests",
+                "old_value": [],
+                "new_value": [
+                  {
+                    "repo": "coder/coder",
+                    "number": 19884
+                  }
+                ],
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Template dormancy 'hour' setting prevents changing back to 'day'",
+                "content_url": "https://github.com/coder/coder/issues/15451",
+                "field_type": "issue_closing_prs"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-19T04:05:58Z",
+                "new_value": "2025-09-19T04:13:44Z",
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "bug: GetWorkspaceByID is called millions of times per day on dogfood",
+                "content_url": "https://github.com/coder/internal/issues/725",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "Status",
+                "old_value": "📚 Backlog",
+                "new_value": "In Progress",
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "Create load generator for Dynamic Parameters",
+                "content_url": "https://github.com/coder/internal/issues/912",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-08-19T01:28:36Z",
+                "new_value": "2025-09-19T05:59:21Z",
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "Create load generator for Dynamic Parameters",
+                "content_url": "https://github.com/coder/internal/issues/912",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "assignees",
+                "old_value": [],
+                "new_value": [
+                  "spikecurtis"
+                ],
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "Create load generator for Dynamic Parameters",
+                "content_url": "https://github.com/coder/internal/issues/912",
+                "field_type": "issue_assignees"
+              },
+              {
+                "field_name": "linked_pull_requests",
+                "old_value": [
+                  {
+                    "repo": "coder/coder",
+                    "state": "OPEN",
+                    "title": "feat: implement API key scopes database enum linter",
+                    "number": 19862,
+                    "mergedAt": null
+                  }
+                ],
+                "new_value": [
+                  {
+                    "repo": "coder/coder",
+                    "state": "OPEN",
+                    "title": "feat: add lint check for API key scope enum completeness",
+                    "number": 19862,
+                    "mergedAt": null
+                  }
+                ],
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Build-time check: DB enum contains all RBAC scopes",
+                "content_url": "https://github.com/coder/coder/issues/19846",
+                "field_type": "issue_linked_prs"
+              },
+              {
+                "field_name": "Status",
+                "old_value": null,
+                "new_value": "📚 Backlog",
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/jetbrains-coder",
+                "content_title": "UI: Unable to select nested devcontainer",
+                "content_url": "https://github.com/coder/jetbrains-coder/issues/574",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "title",
+                "old_value": null,
+                "new_value": "UI: Unable to select nested devcontainer",
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/jetbrains-coder",
+                "content_title": "UI: Unable to select nested devcontainer",
+                "content_url": "https://github.com/coder/jetbrains-coder/issues/574",
+                "field_type": "issue_title"
+              },
+              {
+                "field_name": "body",
+                "old_value": null,
+                "new_value": "I'm experimenting with the relatively new \"native\" devcontainer support in Coder.\n\nI my situation, I create an \"outer\" or \"main\" pod via a kubernetes deployment - that \"main\" pod will contain one or more \"child\" devcontainers.\n\nHowever the coder plugin for Gateway will not let me select and connect to the \"child\" pods.  The plugin correctly authenticates to my deployment and shows all pods - but when selecting a \"child\" pod, the focus will always reset to the \"main\" pod.\n\nI will attach a screen recording showing the behavior.\n\nhttps://github.com/user-attachments/assets/6488713a-d4d2-4584-9122-b36d1296120a\n\nMy environment:\n\nJetBrains Gateway 2025.2.1\nBuild #GW-252.25557.133, built on August 27, 2025\nSource revision: ee1e6cb62e111\nRuntime version: 21.0.8+9-b1038.68 aarch64\nVM: OpenJDK 64-Bit Server VM by JetBrains s.r.o.\nToolkit: sun.lwawt.macosx.LWCToolkit\nmacOS 14.7.8\nThis IDE is managed by Guidewire Software via JetBrains IDE Services.<br>JetBrains IDE Services version: 2025.4.0.2089-ij251, <a href=\"https://gwre-ijlicvault.jetbrains-ide-services.com\">https://gwre-ijlicvault.jetbrains-ide-services.com</a>\nGC: G1 Young Generation, G1 Concurrent GC, G1 Old Generation\nMemory: 2048M\nCores: 11\nMetal Rendering is ON\nRegistry:\n  ide.experimental.ui=true\n  jetbrains.tbe.auth.use.require.new.token=emergency-only\nNon-Bundled Plugins:\n  com.coder.gateway (2.22.1)\n  org.jetbrains.toolbox-enterprise-client (2025.4.0.2089-ij251)\n",
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/jetbrains-coder",
+                "content_title": "UI: Unable to select nested devcontainer",
+                "content_url": "https://github.com/coder/jetbrains-coder/issues/574",
+                "field_type": "issue_body"
+              },
+              {
+                "field_name": "state",
+                "old_value": null,
+                "new_value": "OPEN",
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/jetbrains-coder",
+                "content_title": "UI: Unable to select nested devcontainer",
+                "content_url": "https://github.com/coder/jetbrains-coder/issues/574",
+                "field_type": "issue_state"
+              },
+              {
+                "field_name": "created_at",
+                "old_value": null,
+                "new_value": "2025-09-08T15:39:16Z",
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/jetbrains-coder",
+                "content_title": "UI: Unable to select nested devcontainer",
+                "content_url": "https://github.com/coder/jetbrains-coder/issues/574",
+                "field_type": "issue_created_at"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": null,
+                "new_value": "2025-09-09T15:38:13Z",
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/jetbrains-coder",
+                "content_title": "UI: Unable to select nested devcontainer",
+                "content_url": "https://github.com/coder/jetbrains-coder/issues/574",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "assignees",
+                "old_value": null,
+                "new_value": [
+                  "fioan89"
+                ],
+                "changed_at": "2025-09-19T08:15:17.504Z",
+                "actor_login": "",
+                "repository_name": "coder/jetbrains-coder",
+                "content_title": "UI: Unable to select nested devcontainer",
+                "content_url": "https://github.com/coder/jetbrains-coder/issues/574",
+                "field_type": "issue_assignees"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-18T22:17:12Z",
+                "new_value": "2025-09-19T04:05:58Z",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "bug: GetWorkspaceByID is called millions of times per day on dogfood",
+                "content_url": "https://github.com/coder/internal/issues/725",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "Status",
+                "old_value": null,
+                "new_value": "📚 Backlog",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Failed to dial peer",
+                "content_url": "https://github.com/coder/coder/issues/19882",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "title",
+                "old_value": null,
+                "new_value": "Failed to dial peer",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Failed to dial peer",
+                "content_url": "https://github.com/coder/coder/issues/19882",
+                "field_type": "issue_title"
+              },
+              {
+                "field_name": "body",
+                "old_value": null,
+                "new_value": "cannot authentication for login with github or email",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Failed to dial peer",
+                "content_url": "https://github.com/coder/coder/issues/19882",
+                "field_type": "issue_body"
+              },
+              {
+                "field_name": "state",
+                "old_value": null,
+                "new_value": "OPEN",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Failed to dial peer",
+                "content_url": "https://github.com/coder/coder/issues/19882",
+                "field_type": "issue_state"
+              },
+              {
+                "field_name": "created_at",
+                "old_value": null,
+                "new_value": "2025-09-19T01:05:43Z",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Failed to dial peer",
+                "content_url": "https://github.com/coder/coder/issues/19882",
+                "field_type": "issue_created_at"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": null,
+                "new_value": "2025-09-19T01:05:43Z",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "Failed to dial peer",
+                "content_url": "https://github.com/coder/coder/issues/19882",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "Status",
+                "old_value": null,
+                "new_value": "📚 Backlog",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "bug: GetDeploymentWorkspaceAgentStats creates lots of DB load with many workspaces",
+                "content_url": "https://github.com/coder/internal/issues/1009",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "title",
+                "old_value": null,
+                "new_value": "bug: GetDeploymentWorkspaceAgentStats creates lots of DB load with many workspaces",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "bug: GetDeploymentWorkspaceAgentStats creates lots of DB load with many workspaces",
+                "content_url": "https://github.com/coder/internal/issues/1009",
+                "field_type": "issue_title"
+              },
+              {
+                "field_name": "body",
+                "old_value": null,
+                "new_value": "Over a three hour connection scaletest, with 6k workspaces, this query generated the most load on the DB in terms  of total time, and by CPU utilization - according to CloudSQL query insights.\n\nTimes called: 3460\nAvg execution time (ms): 674.66\n\nP95 execution timing (seconds):\n<img width=\"1730\" height=\"389\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/2bb61e3c-1c43-4511-ad0b-7d15b75fa0a0\" />\n(Each of the four 'blocks' of spikes on the graph correlates with workspace traffic being simulated. i.e. when clients are connected to agents)\n\nCloudSQL Query Insights: \n\n<img width=\"2224\" height=\"480\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/25685f4f-229d-40fd-bbfd-ea28a7642442\" />",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "bug: GetDeploymentWorkspaceAgentStats creates lots of DB load with many workspaces",
+                "content_url": "https://github.com/coder/internal/issues/1009",
+                "field_type": "issue_body"
+              },
+              {
+                "field_name": "state",
+                "old_value": null,
+                "new_value": "OPEN",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "bug: GetDeploymentWorkspaceAgentStats creates lots of DB load with many workspaces",
+                "content_url": "https://github.com/coder/internal/issues/1009",
+                "field_type": "issue_state"
+              },
+              {
+                "field_name": "created_at",
+                "old_value": null,
+                "new_value": "2025-09-19T02:21:11Z",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "bug: GetDeploymentWorkspaceAgentStats creates lots of DB load with many workspaces",
+                "content_url": "https://github.com/coder/internal/issues/1009",
+                "field_type": "issue_created_at"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": null,
+                "new_value": "2025-09-19T02:27:38Z",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "bug: GetDeploymentWorkspaceAgentStats creates lots of DB load with many workspaces",
+                "content_url": "https://github.com/coder/internal/issues/1009",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "Status",
+                "old_value": null,
+                "new_value": "📚 Backlog",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "bug: {\"message\":\"Failed to dial peer.\",\"detail\":\"context deadline exceeded\"}",
+                "content_url": "https://github.com/coder/coder/issues/19883",
+                "field_type": "ProjectV2ItemFieldSingleSelectValue"
+              },
+              {
+                "field_name": "title",
+                "old_value": null,
+                "new_value": "bug: {\"message\":\"Failed to dial peer.\",\"detail\":\"context deadline exceeded\"}",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "bug: {\"message\":\"Failed to dial peer.\",\"detail\":\"context deadline exceeded\"}",
+                "content_url": "https://github.com/coder/coder/issues/19883",
+                "field_type": "issue_title"
+              },
+              {
+                "field_name": "body",
+                "old_value": null,
+                "new_value": "### Is there an existing issue for this?\n\n- [x] I have searched the existing issues\n\n### Current Behavior\n\nI used wsl + dockerdesktop.\n\ni used the following:\n\nexport CODER_DATA=$HOME/.config/coderv2-docker\nexport DOCKER_GROUP=$(getent group docker | cut -d: -f3)\nmkdir -p $CODER_DATA\ndocker run --rm -it \\\n  -v $CODER_DATA:/home/coder/.config \\\n  -v /var/run/docker.sock:/var/run/docker.sock \\\n  --group-add $DOCKER_GROUP \\\n  ghcr.io/coder/coder:latest\n\nI got {\"message\":\"Failed to dial peer.\",\"detail\":\"context deadline exceeded\"}\n\n### Relevant Log Output\n\n```shell\nCoder v2.26.0+a056cb6 - Your Self-Hosted Remote Development Platform\nStarted HTTP listener at http://127.0.0.1:3000\nUsing built-in PostgreSQL (/home/coder/.config/coderv2/postgres)\nOpening tunnel so workspaces can connect to your deployment. For production scenarios, specify an external access URL\n╔═══════════════════════════════════════════════╗\n║               View the Web UI:                ║\n║   https://htlb4lhrog1jq.pit-1.try.coder.app   ║\n╚═══════════════════════════════════════════════╝\n\n==> Logs will stream in below (press ctrl+c to gracefully exit):\n2025-09-19 02:41:34.929 [info]  notifications.manager.notifier: started  notifier_id=b9febc43-0123-494a-906e-e484c10fc059\n2025-09-19 02:41:34.933 [info]  notifications.report_generator: report generator finished  duration=3.621561ms\n```\n\n### Expected Behavior\n\nI want to see the UI.\n\n### Steps to Reproduce\n\n1. prepare dockerdesktop with wsl2(ubuntu)\n2. run the official command\n\n### Environment\n\n- Host OS: win11+wsl2(ubuntu)+dockerdesktop\n- Coder version: see above\n\n\n### Additional Context\n\n_No response_",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "bug: {\"message\":\"Failed to dial peer.\",\"detail\":\"context deadline exceeded\"}",
+                "content_url": "https://github.com/coder/coder/issues/19883",
+                "field_type": "issue_body"
+              },
+              {
+                "field_name": "state",
+                "old_value": null,
+                "new_value": "OPEN",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "bug: {\"message\":\"Failed to dial peer.\",\"detail\":\"context deadline exceeded\"}",
+                "content_url": "https://github.com/coder/coder/issues/19883",
+                "field_type": "issue_state"
+              },
+              {
+                "field_name": "created_at",
+                "old_value": null,
+                "new_value": "2025-09-19T02:48:31Z",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "bug: {\"message\":\"Failed to dial peer.\",\"detail\":\"context deadline exceeded\"}",
+                "content_url": "https://github.com/coder/coder/issues/19883",
+                "field_type": "issue_created_at"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": null,
+                "new_value": "2025-09-19T02:48:31Z",
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "bug: {\"message\":\"Failed to dial peer.\",\"detail\":\"context deadline exceeded\"}",
+                "content_url": "https://github.com/coder/coder/issues/19883",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "labels",
+                "old_value": null,
+                "new_value": [
+                  "needs-triage"
+                ],
+                "changed_at": "2025-09-19T04:13:27.887Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "bug: {\"message\":\"Failed to dial peer.\",\"detail\":\"context deadline exceeded\"}",
+                "content_url": "https://github.com/coder/coder/issues/19883",
+                "field_type": "issue_labels"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-04T16:20:07Z",
+                "new_value": "2025-09-18T21:29:45Z",
+                "changed_at": "2025-09-19T00:47:52.800Z",
+                "actor_login": "",
+                "repository_name": "coder/coder",
+                "content_title": "bug: coder workspaces not auto-stopping when claude-code module is used",
+                "content_url": "https://github.com/coder/coder/issues/19449",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "updated_at",
+                "old_value": "2025-09-03T14:58:45Z",
+                "new_value": "2025-09-18T22:17:12Z",
+                "changed_at": "2025-09-19T00:47:52.800Z",
+                "actor_login": "",
+                "repository_name": "coder/internal",
+                "content_title": "bug: GetWorkspaceByID is called millions of times per day on dogfood",
+                "content_url": "https://github.com/coder/internal/issues/725",
+                "field_type": "issue_updated_at"
+              },
+              {
+                "field_name": "_item_deleted",
+                "old_value": true,
+                "new_value": null,
+                "changed_at": "2025-09-19T00:47:52.800Z",
+                "actor_login": "",
+                "repository_name": "",
+                "content_title": "Deleted Item",
+                "content_url": "",
+                "field_type": "system_event"
+              },
+              {
+                "field_name": "_item_deleted",
+                "old_value": true,
+                "new_value": null,
+                "changed_at": "2025-09-19T00:47:52.800Z",
+                "actor_login": "",
+                "repository_name": "",
+                "content_title": "Deleted Item",
+                "content_url": "",
+                "field_type": "system_event"
+              },
+              {
+                "field_name": "_item_deleted",
+                "old_value": true,
+                "new_value": null,
+                "changed_at": "2025-09-19T00:47:52.800Z",
+                "actor_login": "",
+                "repository_name": "",
+                "content_title": "Deleted Item",
+                "content_url": "",
+                "field_type": "system_event"
+              },
+              {
+                "field_name": "_item_deleted",
+                "old_value": true,
+                "new_value": null,
+                "changed_at": "2025-09-19T00:47:52.800Z",
+                "actor_login": "",
+                "repository_name": "",
+                "content_title": "Deleted Item",
+                "content_url": "",
+                "field_type": "system_event"
+              }
+            ],
+            "appliedLimit": 200,
+            "appliedOffset": 0
+          }
+        }
+      ]
+    },
+    {
+      "created_at": "2025-09-19T20:25:59.124Z",
+      "id": "a8c4b0a4-6c55-4a5f-aed1-db45e91ac073",
+      "role": "assistant",
+      "parts": [
+        {
+          "type": "step-start"
+        },
+        {
+          "type": "text",
+          "text": "Here's what changed today (September 19, 2025) in the v2 project:\n\n## Major Status Changes\n\n**Completed Items:**\n- **Status: \"In Review\" → \"Done\"** - [Add `shared_with_group:` and `shared_with_user:` filters to /workspaces endpoint](https://github.com/coder/internal/issues/1004) (changed_at: 2025-09-19T20:15:23Z)\n- **Status: \"In Progress\" → \"Done\"** - [Add warning message to tasks UI](https://github.com/coder/coder/issues/19739) (changed_at: 2025-09-19T17:36:07Z)\n- **Status: \"In Review\" → \"Done\"** - [flake: TestServer/CanListenUnspecifiedv4](https://github.com/coder/internal/issues/946) (changed_at: 2025-09-19T12:20:57Z)\n\n**Status Progressions:**\n- **Status: \"In Progress\" → \"In Review\"** - [Add `shared_with_group:` and `shared_with_user:` filters to /workspaces endpoint](https://github.com/coder/internal/issues/1004) (changed_at: 2025-09-19T17:36:07Z)\n- **Status: \"In Progress\" → \"In Review\"** - [Refactor Create workspaces subcommand to split User and Workspace creation](https://github.com/coder/internal/issues/985) (changed_at: 2025-09-19T12:20:57Z)\n\n**New Work Started:**\n- **Status: null → \"In Progress\"** - [MCP: Add `coder_*_task` tools](https://github.com/coder/internal/issues/776) (changed_at: 2025-09-19T17:36:07Z)\n- **Status: \"📚 Backlog\" → \"In Progress\"** - [Refactor Create workspaces subcommand to split User and Workspace creation](https://github.com/coder/internal/issues/985) (changed_at: 2025-09-19T08:15:17Z)\n- **Status: \"📚 Backlog\" → \"In Progress\"** - [Create load generator for Dynamic Parameters](https://github.com/coder/internal/issues/912) (changed_at: 2025-09-19T08:15:17Z)\n\n## New Issues Created\n\n- [Tasks: Task doesn't appear in the task list](https://github.com/coder/coder/issues/19894) - Status: \"📚 Backlog\" (created: 2025-09-19T17:14:44Z)\n- [Tasks: Status isn't being updated correctly](https://github.com/coder/coder/issues/19893) - Status: \"📚 Backlog\" (created: 2025-09-19T17:11:08Z)\n- [dbpurge: purge expired api keys](https://github.com/coder/coder/issues/19889) - Status: \"📚 Backlog\" (created: 2025-09-19T11:02:21Z)\n- [Failed to dial peer](https://github.com/coder/coder/issues/19882) - Status: \"📚 Backlog\" (created: 2025-09-19T01:05:43Z)\n- [bug: {\\\"message\\\":\\\"Failed to dial peer.\\\",\\\"detail\\\":\\\"context deadline exceeded\\\"}](https://github.com/coder/coder/issues/19883) - Status: \"📚 Backlog\" (created: 2025-09-19T02:48:31Z)\n\n## Assignment Changes\n\n- **Assignees: [] → [\"rafrdz\"]** - [feat: prompt User to add missing `var` in CLI](https://github.com/coder/coder/issues/19782)\n- **Assignees: [] → [\"BrunoQuaresma\"]** - [Improve task creation UX: avoid auto-redirect to encourage background agent workflow](https://github.com/coder/coder/issues/19675)\n- **Assignees: [] → [\"code-asher\"]** - [MCP: Add `coder_*_task` tools](https://github.com/coder/internal/issues/776)\n- **Assignees: [] → [\"spikecurtis\"]** - [Create load generator for Dynamic Parameters](https://github.com/coder/internal/issues/912)\n- **Assignees: null → [\"fioan89\"]** - [UI: Unable to select nested devcontainer](https://github.com/coder/jetbrains-coder/issues/574)\n\n## Issue State Changes\n\n- **State: \"OPEN\" → \"CLOSED\"** - Multiple issues including the shared_with_group filters issue and the tasks UI warning message issue\n- **State: null → \"OPEN\"** - Several new issues were created and opened\n\n## Pull Request Updates\n\nSeveral pull requests were merged, including:\n- [feat: add best effort attempt to revoke oauth access token in external auth provider #19775](https://github.com/coder/coder/pull/19775) - **MERGED** (2025-09-19T14:27:02Z)\n- [feat(site): display warnings in tasks page when wildcard is not configured #19780](https://github.com/coder/coder/pull/19780) - **MERGED** (2025-09-19T13:49:34Z)\n\nThe day shows significant progress with 3 items completed, several items moving through the development pipeline, and new issues being triaged and assigned to team members.",
           "state": "done"
         }
       ]
