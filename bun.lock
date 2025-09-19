@@ -5,7 +5,7 @@
       "name": "github-project-agent",
       "dependencies": {
         "ai": "^5.0.44",
-        "blink": "^0.1.25",
+        "blink": "^0.1.32",
         "esbuild": "^0.25.9",
         "pg": "^8.13.0",
         "zod": "^4.1.8",
@@ -145,7 +145,7 @@
 
     "assertion-error": ["assertion-error@2.0.1", "", {}, "sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA=="],
 
-    "blink": ["blink@0.1.25", "", { "dependencies": { "zod": "^4.1.5" }, "optionalDependencies": { "esbuild": "^0.25.9" }, "bin": { "blink": "dist/cli/index.js" } }, "sha512-pufQ3lUq0bYJLg0BZ8KjS0+uy98TdfhDrS01MB8qqPH1MR+lL4b5MzU3d4Yyqkcq/loo27JiN5bhsdJiIlzhlA=="],
+    "blink": ["blink@0.1.32", "", { "dependencies": { "zod": "^4.1.5" }, "optionalDependencies": { "esbuild": "^0.25.9" }, "bin": { "blink": "dist/cli/index.js" } }, "sha512-z16l5q/uJoqhftCAzbC3/7lRYLE8JJuGqwRSQqy92C1rmjGo+1YuhxuqXuFiLsAEYvH8DFiF7dwBF7F1XZqSNg=="],
 
     "cac": ["cac@6.7.14", "", {}, "sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ=="],
 
