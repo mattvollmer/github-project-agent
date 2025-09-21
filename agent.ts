@@ -4,6 +4,7 @@ import { z } from "zod";
 import { convertToModelMessages } from "ai";
 import { getSchema, runQuery } from "./db.ts";
 import { buildSystemPrompt } from "./prompt.ts";
+import * as slackbot from "@blink-sdk/slackbot";
 
 export default blink.agent({
   async sendMessages({ messages }) {
@@ -20,6 +21,9 @@ export default blink.agent({
       system: buildSystemPrompt(),
       messages: convertToModelMessages(messages),
       tools: {
+        ...slackbot.tools({
+          messages,
+        }),
         db_schema: tool({
           description:
             "Return the schema and usage notes for the Neon database backing GitHub Project insights. Includes tables, columns, indexes, and a concise guide for common queries using project_name.",
@@ -147,5 +151,13 @@ export default blink.agent({
         }
       },
     });
+  },
+  async webhook(request) {
+    if (slackbot.isOAuthRequest(request)) {
+      return slackbot.handleOAuthRequest(request);
+    }
+    if (slackbot.isWebhook(request)) {
+      return slackbot.handleWebhook(request);
+    }
   },
 });
