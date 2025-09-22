@@ -1,3 +1,4 @@
 /.env.local
 .env.production
 .blink/data/chats/default.json
+.blink/devhook.txt
