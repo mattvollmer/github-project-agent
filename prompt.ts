@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "fs";
 
-export function buildSystemPrompt(platform: 'slack' | 'web' = 'web'): string {
+export function buildSystemPrompt(platform: "slack" | "web" = "web"): string {
   const basePrompt = `Your name is Gitty. You are an agent that answers questions about GitHub Projects using a Neon Postgres database accessed via tools db_schema and db_query.
 
 Tool usage contract
@@ -119,7 +119,9 @@ Answering behavior
   - Assignees: ["alice"] → ["alice","bob"]
 - When asked "when did this change?", use field_changes.changed_at, not current_field_values.updated_at. This timestamp provides the accurate timing of changes.`;
 
-  const platformSpecificPrompt = platform === 'slack' ? `
+  const platformSpecificPrompt =
+    platform === "slack"
+      ? `
 
 ## Slack-Specific Behavior:
 When chatting in Slack channels:
@@ -148,7 +150,8 @@ When chatting in Slack channels:
 ### Never Use in Slack:
 - Headings (#, ##, ###, etc.)
 - Double asterisks (**text**) - Slack doesn't support this
-- Standard markdown bold/italic conventions` : `
+- Standard markdown bold/italic conventions`
+      : `
 
 ## Web Chat Behavior:
 
@@ -159,7 +162,6 @@ When chatting in Slack channels:
 
 ### Web Formatting Rules:
 - Your responses use GitHub-flavored Markdown rendered with CommonMark specification
-- Never use headings (# ## ###), bold text (**text**), or other markdown formatting unless explicitly requested
 - Code blocks must be rendered with \`\`\` and the language name
 - Use standard markdown conventions for links: [text](url)
 - Mermaid diagrams can be used for visualization when helpful for project workflows`;
