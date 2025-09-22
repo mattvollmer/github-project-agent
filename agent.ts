@@ -6,6 +6,11 @@ import { getSchema, runQuery } from "./db.ts";
 import { buildSystemPrompt } from "./prompt.ts";
 import * as slackbot from "@blink-sdk/slackbot";
 
+// Platform detection
+const detectPlatform = (messages: any[]) => {
+  return slackbot.findLastMessageMetadata(messages) ? 'slack' : 'web';
+};
+
 export default blink.agent({
   async sendMessages({ messages }) {
     const reqId =
@@ -17,10 +22,13 @@ export default blink.agent({
         Array.isArray(messages) ? messages.length : "n/a"
       }`
     );
+    
+    const platform = detectPlatform(messages);
+    
     return streamText({
       //model: "openai/gpt-oss-120b",
       model: "anthropic/claude-sonnet-4",
-      system: buildSystemPrompt(),
+      system: buildSystemPrompt(platform),
       messages: convertToModelMessages(messages),
       tools: {
         ...slackbot.tools({
