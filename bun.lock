@@ -6,7 +6,7 @@
       "dependencies": {
         "@blink-sdk/slackbot": "^0.0.7",
         "ai": "^5.0.44",
-        "blink": "^0.1.32",
+        "blink": "^0.1.41",
         "esbuild": "^0.25.9",
         "pg": "^8.13.0",
         "zod": "^4.1.8",
@@ -154,7 +154,7 @@
 
     "assertion-error": ["assertion-error@2.0.1", "", {}, "sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA=="],
 
-    "blink": ["blink@0.1.32", "", { "dependencies": { "zod": "^4.1.5" }, "optionalDependencies": { "esbuild": "^0.25.9" }, "bin": { "blink": "dist/cli/index.js" } }, "sha512-z16l5q/uJoqhftCAzbC3/7lRYLE8JJuGqwRSQqy92C1rmjGo+1YuhxuqXuFiLsAEYvH8DFiF7dwBF7F1XZqSNg=="],
+    "blink": ["blink@0.1.41", "", { "dependencies": { "zod": "^4.1.5" }, "optionalDependencies": { "esbuild": "^0.25.9" }, "bin": { "blink": "dist/cli/index.js" } }, "sha512-EDdTCFaLMAEDsWifEBqbV99nb5CfPFRxvSseGoQGCM3nrnJ32s1FgD12Joxcv06WS0USvgHzVkg4DCZIbW7oHw=="],
 
     "cac": ["cac@6.7.14", "", {}, "sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ=="],
 
