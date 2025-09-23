@@ -9,7 +9,7 @@
     "test:e2e": "vitest run tests/e2e_nl_sql.spec.ts"
   },
   "dependencies": {
-    "@blink-sdk/slackbot": "^0.0.5",
+    "@blink-sdk/slackbot": "^0.0.7",
     "ai": "^5.0.44",
     "blink": "^0.1.32",
     "esbuild": "^0.25.9",
@@ -19,6 +19,7 @@
   "devDependencies": {
     "@types/node": "^24.4.0",
     "@types/pg": "^8.15.5",
-    "vitest": "^2.0.0"
+    "vitest": "^2.0.0",
+    "@blink-sdk/model-intent": "^0.0.3"
   }
 }
