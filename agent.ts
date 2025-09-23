@@ -212,7 +212,15 @@ export default blink.agent({
               }
               return displayIntent;
             });
-            statuses = [...new Set(statuses)];
+            const IGNORE = new Set([
+              "slackbot_react_to_message",
+              "slackbotReactToMessage",
+              "react_to_message",
+            ]);
+            statuses = [...new Set(statuses.filter((s) => !IGNORE.has(s)))];
+            if (statuses.length === 0) {
+              return;
+            }
             const client = await slackbot.createClient(metadata);
             try {
               await client.assistant.threads.setStatus({
